@@ -8,10 +8,10 @@ import google.generativeai as genai
 from datetime import datetime, timedelta
 
 # Configure API keys
-GOOGLE_API_KEY = os.environ['GOOGLE_API_KEY']
+GOOGLE_API_KEY = st.secrets['GOOGLE_API_KEY']
 genai.configure(api_key=GOOGLE_API_KEY)
-google_places_api_key = os.environ['MAPS_API_KEY']
-weather_api_key = os.environ['WEATHER']
+google_places_api_key = st.secrets['MAPS_API_KEY']
+weather_api_key = st.secrets['WEATHER']
 # Include all your existing functions here (get_place_details, get_weather_forecast, etc.)
 
 # Chatbot function
