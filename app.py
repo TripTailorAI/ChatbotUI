@@ -1,3 +1,6 @@
+!pip install -U -q google-generativeai
+!pip install googlemaps
+
 import streamlit as st
 import requests
 import json
