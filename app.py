@@ -5,7 +5,6 @@ import json
 import pandas as pd
 import random
 import google.generativeai as genai
-from google.colab import userdata
 from datetime import datetime, timedelta
 
 # Configure API keys
