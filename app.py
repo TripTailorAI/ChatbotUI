@@ -1,6 +1,4 @@
-!pip install -U -q google-generativeai
-!pip install googlemaps
-
+import os
 import streamlit as st
 import requests
 import json
@@ -11,11 +9,10 @@ from google.colab import userdata
 from datetime import datetime, timedelta
 
 # Configure API keys
-GOOGLE_API_KEY = userdata.get('GOOGLE_API_KEY')
+GOOGLE_API_KEY = os.environ['GOOGLE_API_KEY']
 genai.configure(api_key=GOOGLE_API_KEY)
-google_places_api_key = userdata.get('MAPS_API_KEY')
-weather_api_key = userdata.get('WEATHER')
-
+google_places_api_key = os.environ['MAPS_API_KEY']
+weather_api_key = os.environ['WEATHER']
 # Include all your existing functions here (get_place_details, get_weather_forecast, etc.)
 
 # Chatbot function
