@@ -176,7 +176,7 @@ def chatbot(user_message):
     return response.text
 
 # Create the Streamlit app
-st.title("MesoP Travel Chatbot")
+st.title("VoyagerAI")
 
 # Initialize chat history
 if 'chat_history' not in st.session_state:
