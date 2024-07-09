@@ -170,12 +170,6 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
     return all_itineraries
 
 # Chatbot function
-def chatbot(user_message):
-    model = genai.GenerativeModel('gemini-1.5-flash')
-    response = model.generate_content(user_message)
-    return response.text
-
-# Create the Streamlit app
 st.title("VoyagerAI")
 
 # Initialize chat history
@@ -184,7 +178,7 @@ if 'chat_history' not in st.session_state:
 
 # Display chat history
 for message in st.session_state.chat_history:
-    st.write(f"VoyagerAI: {message['text']}")
+    st.markdown(message['text'])
 
 # Sidebar for itinerary generation
 st.sidebar.title("Itinerary Generator")
@@ -201,18 +195,20 @@ if st.sidebar.button("Generate Itinerary"):
     try:
         itineraries = create_travel_itinerary(destination, country, start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d"), hotel_name, purpose_of_stay)
         
-        # Add generated itineraries to chat history
-        itinerary_message = "Generated Itineraries:\n"
+        # Format and display the generated itineraries
+        itinerary_message = "## Generated Itineraries\n\n"
         for itinerary_number, itinerary in enumerate(itineraries, 1):
-            itinerary_message += f"Itinerary {itinerary_number}\n"
+            itinerary_message += f"### Itinerary {itinerary_number}\n\n"
             for day in itinerary:
-                itinerary_message += f"Date: {day['date']}\n"
-                itinerary_message += f"Weather forecast: {day['weather']}\n"
+                itinerary_message += f"**Date:** {day['date']}\n\n"
+                itinerary_message += f"**Weather forecast:** {day['weather']}\n\n"
                 for activity in day['activities']:
-                    itinerary_message += f"   {activity['time']}: {activity['activity']} at {activity['place']['name']} | Address: {activity['place']['formatted_address']} | Status: {activity['open_status']}\n"
-                itinerary_message += "\n"
-            itinerary_message += "\n"
+                    itinerary_message += f"- {activity['time']}: {activity['activity']} at **{activity['place']['name']}**\n"
+                    itinerary_message += f"  - Address: {activity['place']['formatted_address']}\n"
+                    itinerary_message += f"  - Status: {activity['open_status']}\n\n"
+                itinerary_message += "---\n\n"
         
         st.session_state.chat_history.append({'text': itinerary_message})
+        st.experimental_rerun()  # Automatically rerun the app to display the updated output
     except Exception as e:
         st.sidebar.error(f"An error occurred while creating the itinerary: {e}")
