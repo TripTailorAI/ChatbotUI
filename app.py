@@ -184,23 +184,7 @@ if 'chat_history' not in st.session_state:
 
 # Display chat history
 for message in st.session_state.chat_history:
-    if message['is_user']:
-        st.write(f"You: {message['text']}")
-    else:
-        st.write(f"MesoP: {message['text']}")
-
-# User input
-user_input = st.text_input("You:", "")
-
-if st.button("Send") or user_input:
-    # Add user message to chat history
-    st.session_state.chat_history.append({'is_user': True, 'text': user_input})
-    
-    # Generate chatbot response
-    bot_response = chatbot(user_input)
-    
-    # Add bot response to chat history
-    st.session_state.chat_history.append({'is_user': False, 'text': bot_response})
+    st.write(f"VoyagerAI: {message['text']}")
 
 # Sidebar for itinerary generation
 st.sidebar.title("Itinerary Generator")
@@ -229,6 +213,6 @@ if st.sidebar.button("Generate Itinerary"):
                 itinerary_message += "\n"
             itinerary_message += "\n"
         
-        st.session_state.chat_history.append({'is_user': False, 'text': itinerary_message})
+        st.session_state.chat_history.append({'text': itinerary_message})
     except Exception as e:
         st.sidebar.error(f"An error occurred while creating the itinerary: {e}")
