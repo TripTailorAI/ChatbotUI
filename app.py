@@ -12,7 +12,7 @@ genai.configure(api_key=GOOGLE_API_KEY)
 google_places_api_key = st.secrets['MAPS_API_KEY']
 weather_api_key = st.secrets['WEATHER']
 
-def get_place_details(query, location, radius=5000):
+def get_place_details(query, location, radius=5000, min_rating=3.5, min_reviews=15):
     url = "https://maps.googleapis.com/maps/api/place/textsearch/json"
     params = {
         'query': query,
@@ -23,23 +23,35 @@ def get_place_details(query, location, radius=5000):
     response = requests.get(url, params=params)
     places = response.json().get('results', [])
 
-    detailed_places = []
-    for place in places:
-        place_id = place['place_id']
-        details_url = f"https://maps.googleapis.com/maps/api/place/details/json"
-        details_params = {
-            'place_id': place_id,
-            'fields': 'name,formatted_address,type,opening_hours,rating',
-            'key': google_places_api_key
-        }
-        details_response = requests.get(details_url, params=details_params)
-        details = details_response.json().get('result', {})
-        detailed_places.append(details)
-
-    if not detailed_places:
+    if not places:
         print(f"No places found for query: {query}")
+        return None
 
-    return detailed_places
+    # Filter places by minimum rating
+    filtered_places = [place for place in places if place.get('rating', 0) >= min_rating]
+
+    if not filtered_places:
+        print(f"No places found with a minimum rating of {min_rating} for query: {query}")
+        return None
+
+    # Sort places by number of reviews and rating
+    sorted_places = sorted(filtered_places, key=lambda x: (x.get('user_ratings_total', 0), x.get('rating', 0)), reverse=True)
+    
+    # Select the top place
+    top_place = sorted_places[0]
+
+    # Get details for the top place
+    place_id = top_place['place_id']
+    details_url = f"https://maps.googleapis.com/maps/api/place/details/json"
+    details_params = {
+        'place_id': place_id,
+        'fields': 'name,formatted_address,type,opening_hours,rating,user_ratings_total',
+        'key': google_places_api_key
+    }
+    details_response = requests.get(details_url, params=details_params)
+    details = details_response.json().get('result', {})
+
+    return details
 
 def get_weather_forecast(city):
     url = f"https://api.weatherapi.com/v1/forecast.json?key={weather_api_key}&q={city}&days=14"
@@ -146,12 +158,10 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
                 if place_details:
                     selected_place = place_details[0]  # Take the first match
                     if is_place_in_location(selected_place, destination, country):
-                        open_status = is_place_open(selected_place, current_date, item['time'])
                         verified_itinerary.append({
                             'time': item['time'],
                             'activity': item['activity'],
-                            'place': selected_place,
-                            'open_status': 'Open' if open_status else 'Closed' if open_status is False else 'Unknown'
+                            'place': selected_place
                         })
                         used_places.add(item['place'])  # Add to used places
                     else:
@@ -205,7 +215,6 @@ if st.sidebar.button("Generate Itinerary"):
                 for activity in day['activities']:
                     itinerary_message += f"- {activity['time']}: {activity['activity']} at **{activity['place']['name']}**\n"
                     itinerary_message += f"  - Address: {activity['place']['formatted_address']}\n"
-                    itinerary_message += f"  - Status: {activity['open_status']}\n\n"
                 itinerary_message += "---\n\n"
         
         st.session_state.chat_history.append({'text': itinerary_message})
