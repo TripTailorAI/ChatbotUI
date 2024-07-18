@@ -161,12 +161,10 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
                 if place_details:
                     selected_place = place_details
                     if is_place_in_location(selected_place, destination, country):
-                        open_status = is_place_open(selected_place, current_date, item['time'])
                         verified_itinerary.append({
                             'time': item['time'],
                             'activity': item['activity'],
-                            'place': selected_place,
-                            'open_status': 'Open' if open_status else 'Closed' if open_status is False else 'Unknown'
+                            'place': selected_place
                         })
                         used_places.add(item['place'])  # Add to used places
                     else:
@@ -220,7 +218,6 @@ if st.sidebar.button("Generate Itinerary"):
                 for activity in day['activities']:
                     itinerary_message += f"- {activity['time']}: {activity['activity']} at **{activity['place']['name']}**\n"
                     itinerary_message += f"  - Address: {activity['place']['formatted_address']}\n"
-                    itinerary_message += f"  - Open Status: {activity['open_status']}\n"
                 itinerary_message += "---\n\n"
         
         st.session_state.chat_history.append({'text': itinerary_message})
