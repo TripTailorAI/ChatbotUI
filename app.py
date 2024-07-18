@@ -220,4 +220,6 @@ if st.sidebar.button("Generate Itinerary"):
         st.session_state.chat_history.append({'text': itinerary_message})
         st.experimental_rerun()  # Automatically rerun the app to display the updated output
     except Exception as e:
-        st.sidebar.error(f"An error occurred while creating the itinerary: {e}")
+        st.sidebar.error(f"An error occurred while creating the itinerary: {str(e)}")
+        st.sidebar.error(f"Exception type: {type(e)}")
+        st.sidebar.error(f"Exception traceback: {traceback.format_exc()}")
