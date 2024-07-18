@@ -3,6 +3,7 @@ import requests
 import json
 import pandas as pd
 import random
+import traceback
 import google.generativeai as genai
 from datetime import datetime, timedelta
 
