@@ -13,7 +13,7 @@ genai.configure(api_key=GOOGLE_API_KEY)
 google_places_api_key = st.secrets['MAPS_API_KEY']
 weather_api_key = st.secrets['WEATHER']
 
-def get_place_details(query, location, radius=5000, min_rating=3.5):
+def get_place_details(query, location, radius=5000, min_rating=4.0, min_reviews=150):
     url = "https://maps.googleapis.com/maps/api/place/textsearch/json"
     params = {
         'query': query,
@@ -28,11 +28,11 @@ def get_place_details(query, location, radius=5000, min_rating=3.5):
         print(f"No places found for query: {query}")
         return None
 
-    # Filter places by minimum rating
-    filtered_places = [place for place in places if place.get('rating', 0) >= min_rating]
+    # Filter places by minimum rating and minimum number of reviews
+    filtered_places = [place for place in places if place.get('rating', 0) >= min_rating and place.get('user_ratings_total', 0) >= min_reviews]
 
     if not filtered_places:
-        print(f"No places found with a minimum rating of {min_rating} for query: {query}")
+        print(f"No places found with a minimum rating of {min_rating} and a minimum of {min_reviews} reviews for query: {query}")
         return None
 
     # Sort places by number of reviews and rating
