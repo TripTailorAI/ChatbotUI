@@ -108,7 +108,7 @@ def is_place_in_location(place, destination, country):
     return (destination.lower() in address or country.lower() in address or
             any(destination.lower() in component['long_name'].lower() or
                 country.lower() in component['long_name'].lower()
-                for component in place.get('address_components', []))
+                for component in place.get('address_components', [])))
 
 def get_place_opening_hours(place, date):
     if 'opening_hours' not in place or 'periods' not in place['opening_hours']:
