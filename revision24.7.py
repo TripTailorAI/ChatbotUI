@@ -205,11 +205,9 @@ if st.sidebar.button("Generate Itinerary"):
         try:
             itineraries = create_travel_itinerary(destination, country, start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d"), hotel_name, purpose_of_stay)
             
-            # Display the generated itineraries in a table
-            for itinerary_number, itinerary in enumerate(itineraries, 1):
-                st.subheader(f"Itinerary {itinerary_number}")
-                itinerary_data = []
-                
+            # Create the table data
+            table_data = []
+            for itinerary in itineraries:
                 for day in itinerary:
                     date = day['date']
                     weather = day['weather']
@@ -221,10 +219,24 @@ if st.sidebar.button("Generate Itinerary"):
                         address = activity['place']['formatted_address']
                         opening_hours = activity['opening_hours']
                         
-                        itinerary_data.append([date, weather, time, activity_name, place_name, address, opening_hours])
-                
-                df = pd.DataFrame(itinerary_data, columns=['Date', 'Weather', 'Time', 'Activity', 'Place', 'Address', 'Opening Hours'])
-                st.table(df)
+                        table_data.append([date, weather, time, activity_name, place_name, address, opening_hours])
+            
+            # Create the DataFrame
+            df = pd.DataFrame(table_data, columns=['Date', 'Weather', 'Time', 'Activity', 'Place', 'Address', 'Opening Hours'])
+            
+            # Format and display the generated itineraries
+            itinerary_message = "## Generated Itineraries\n\n"
+            for itinerary_number, itinerary in enumerate(itineraries, 1):
+                itinerary_message += f"### Itinerary {itinerary_number}\n\n"
+                for day in itinerary:
+                    itinerary_message += f"**Date:** {day['date']}\n\n"
+                    itinerary_message += f"**Weather forecast:** {day['weather']}\n\n"
+                    for activity in day['activities']:
+                        itinerary_message += f"- {activity['time']}: {activity['activity']} at **{activity['place']['name']}**\n"
+                        itinerary_message += f"  - Address: {activity['place']['formatted_address']}\n"
+                        itinerary_message += f"  - Opening Hours: {activity['opening_hours']}\n"
+                    itinerary_message += "---\n\n"
+            
             
             # Export and email functionality
             if st.button("Export as PDF"):
@@ -236,10 +248,13 @@ if st.sidebar.button("Generate Itinerary"):
                 st.success("PDF sent via email.")
             
             # Display the AI agent's response
-            st.subheader("AI Agent's Response")
+            st.subheader("VoyagerAI's Response")
             st.write("Here's the generated itinerary based on your preferences:")
-            st.write(itineraries)
             
+            # Display the table
+            #st.table(df)
+            st.markdown(itinerary_message)
+
         except Exception as e:
             st.sidebar.error(f"An error occurred while creating the itinerary: {str(e)}")
             st.sidebar.error(f"Exception type: {type(e)}")
