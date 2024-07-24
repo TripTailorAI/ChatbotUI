@@ -111,7 +111,7 @@ def is_place_in_location(place, destination, country):
                 for component in place.get('address_components', [])))
 
 def get_place_opening_hours(place, date):
-    if 'opening_hours' not in place or 'periods' not in place['opening_hours']:
+    if place is None or 'opening_hours' not in place or 'periods' not in place['opening_hours']:
         return "N/A"  # Opening hours not available
 
     dt = datetime.strptime(date, "%Y-%m-%d")
