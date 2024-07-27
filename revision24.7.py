@@ -85,7 +85,7 @@ def get_weather_forecast(city):
         print(f"Response content: {response.content}")
         raise e
 
-def get_daily_itinerary(destination, country, date, hotel_name, purpose_of_stay, weather_forecast, day_number, trip_length, used_places):
+def get_daily_itinerary(destination, country, date, hotel_name, purpose_of_stay, weather_forecast, day_number, trip_length, used_places, mode_of_transport):
     used_places_str = ", ".join(used_places)
     user_message = f"""
     Create a detailed itinerary for day {day_number} of a {trip_length}-day trip to {destination}, {country}.
@@ -93,9 +93,10 @@ def get_daily_itinerary(destination, country, date, hotel_name, purpose_of_stay,
     Staying at: {hotel_name}
     Purpose of stay: {purpose_of_stay}
     Weather forecast: {weather_forecast}
+    Mode of transportation: {mode_of_transport}
 
     Please provide a full day's itinerary with suggested times for each activity. Include local meals, sightseeing, and other relevant activities.
-    Be specific with place names and try to suggest a variety of activities suitable for the destination and weather.
+    Be specific with place names and try to suggest a variety of activities suitable for the destination, weather, and transportation mode.
 
     Important guidelines:
     1. Do not include breakfast or any activities at the hotel.
@@ -103,6 +104,7 @@ def get_daily_itinerary(destination, country, date, hotel_name, purpose_of_stay,
     3. Do not repeat any place names within the same itinerary. Each day should have unique activities.
     4. The following places have already been used in previous days and should not be suggested again: {used_places_str}
     5. Ensure all suggested places are within {destination}. Do not suggest places in other cities.
+    6. Consider the mode of transportation when suggesting places. If the mode is walking, keep destinations closer together.
 
     Format the output as a JSON object with each entry containing:
     - time: suggested time for the activity (e.g., "09:00")
@@ -175,7 +177,7 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
             else:
                 weather_summary = "Weather data not available"
 
-            daily_itinerary = get_daily_itinerary(destination, country, current_date, hotel_name, purpose_of_stay, weather_summary, day + 1, num_days, all_used_places)
+            daily_itinerary = get_daily_itinerary(destination, country, current_date, hotel_name, purpose_of_stay, weather_summary, day + 1, num_days, all_used_places, mode_of_transport)
 
             if daily_itinerary is None:
                 print(f"Error: Failed to get itinerary from GeminiAI for {current_date}")
@@ -253,29 +255,10 @@ if st.sidebar.button("Generate Itinerary"):
         try:
             itineraries = create_travel_itinerary(destination, country, start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d"), hotel_name, purpose_of_stay, mode_of_transport_value)
             
-            # Create the table data
-            table_data = []
-            for itinerary in itineraries:
-                for day in itinerary:
-                    date = day['date']
-                    weather = day['weather']
-                    
-                    for activity in day['activities']:
-                        time = activity['time']
-                        activity_name = activity['activity']
-                        place = activity.get('place', {})
-                        place_name = place.get('name', 'Unknown')
-                        address = place.get('formatted_address', 'Unknown')
-                        opening_hours = activity.get('opening_hours', 'N/A')
-                        
-                        table_data.append([date, weather, time, activity_name, place_name, address, opening_hours])
-            
-            
-            # Create the DataFrame
-            df = pd.DataFrame(table_data, columns=['Date', 'Weather', 'Time', 'Activity', 'Place', 'Address', 'Opening Hours'])
-            
-            # Format and display the generated itineraries
-            itinerary_message = "## Generated Itineraries\n\n"
+            # Display the AI agent's response
+            st.subheader("VoyagerAI's Response")
+            st.write("Here are the generated itineraries based on your preferences:")
+
             for itinerary_number, itinerary in enumerate(itineraries, 1):
                 with st.expander(f"Itinerary {itinerary_number}", expanded=True):
                     itinerary_message = ""
@@ -296,25 +279,19 @@ if st.sidebar.button("Generate Itinerary"):
                                     color = 'red'
                                 itinerary_message += f"  - :clock3: Travel time to next location ({mode_of_transport[:-8]}): <font color='{color}'>{activity['duration_to_next']}</font>\n"
                         itinerary_message += "---\n\n"
-                        
+                    
+                    st.markdown(itinerary_message, unsafe_allow_html=True)
+                    
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        if st.button(f"Export Itinerary {itinerary_number} as PDF 📄"):
+                            # Implement PDF export logic here
+                            st.success(f"Itinerary {itinerary_number} exported as PDF.")
+                    with col2:
+                        if st.button(f"Send Itinerary {itinerary_number} via Email 📧"):
+                            # Implement email sending logic here
+                            st.success(f"Itinerary {itinerary_number} sent via email.")
 
-            
-            # Display the AI agent's response
-            st.subheader("VoyagerAI's Response")
-            st.write("Here's the generated itinerary based on your preferences:")
-            
-            # Display the table
-            #st.table(df)
-            st.markdown(itinerary_message, unsafe_allow_html=True)
-            col1, col2 = st.columns(2)
-            with col1:
-                if st.button(f"Export Itinerary {itinerary_number} as PDF 📄"):
-                    # Implement PDF export logic here
-                    st.success(f"Itinerary {itinerary_number} exported as PDF.")
-            with col2:
-                if st.button(f"Send Itinerary {itinerary_number} via Email 📧"):
-                    # Implement email sending logic here
-                    st.success(f"Itinerary {itinerary_number} sent via email.")
         except Exception as e:
             st.sidebar.error(f"An error occurred while creating the itinerary: {str(e)}")
             st.sidebar.error(f"Exception type: {type(e)}")
