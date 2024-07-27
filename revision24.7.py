@@ -34,8 +34,12 @@ def get_place_details(query, location, radius=5000, min_rating=2.5, min_reviews=
 
     if not filtered_places:
         print(f"No places found with a minimum rating of {min_rating} and a minimum of {min_reviews} reviews for query: {query}")
-        return {"name": query.split(" in ")[0], "formatted_address": f"{query.split(' in ')[1]}", "rating": "N/A", "user_ratings_total": "N/A"}
-
+        return {
+            "name": query.split(" in ")[0],
+            "formatted_address": f"{query.split(' in ')[1]}",
+            "rating": "N/A",
+            "user_ratings_total": "N/A"
+        }
     # Sort places by number of reviews and rating
     sorted_places = sorted(filtered_places, key=lambda x: (x.get('user_ratings_total', 0), x.get('rating', 0)), reverse=True)
     
@@ -53,8 +57,11 @@ def get_place_details(query, location, radius=5000, min_rating=2.5, min_reviews=
     details_response = requests.get(details_url, params=details_params)
     details = details_response.json().get('result', {})
 
-    return details
+    # Ensure that 'formatted_address' is always present
+    if 'formatted_address' not in details:
+        details['formatted_address'] = f"{query.split(' in ')[1]}"
 
+    return details
 def get_weather_forecast(city):
     url = f"https://api.weatherapi.com/v1/forecast.json?key={weather_api_key}&q={city}&days=14"
     response = requests.get(url)
