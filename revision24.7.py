@@ -94,10 +94,15 @@ def get_daily_itinerary(destination, country, date, hotel_name, purpose_of_stay,
     Purpose of stay: {purpose_of_stay}
     Weather forecast: {weather_forecast}
 
-    Please provide a full day's itinerary with suggested times for each activity. Include meals, sightseeing, and any other relevant activities.
+    Please provide a full day's itinerary with suggested times for each activity. Include local meals, sightseeing, and other relevant activities.
     Be specific with place names and try to suggest a variety of activities suitable for the destination and weather.
-    IMPORTANT: Do not repeat any place names within the same itinerary. Each day should have unique activities.
-    The following places have already been used in previous days and should not be suggested again: {used_places_str}
+
+    Important guidelines:
+    1. Do not include breakfast or any activities at the hotel.
+    2. Start the itinerary with the first activity outside the hotel.
+    3. Do not repeat any place names within the same itinerary. Each day should have unique activities.
+    4. The following places have already been used in previous days and should not be suggested again: {used_places_str}
+    5. Ensure all suggested places are within {destination}. Do not suggest places in other cities.
 
     Format the output as a JSON object with each entry containing:
     - time: suggested time for the activity (e.g., "09:00")
@@ -106,8 +111,8 @@ def get_daily_itinerary(destination, country, date, hotel_name, purpose_of_stay,
 
     Example format:
     {{
-        "1": {{"time": "09:00", "activity": "Breakfast", "place": "Specific Cafe Name"}},
-        "2": {{"time": "10:30", "activity": "Morning sightseeing", "place": "Specific Landmark Name"}},
+        "1": {{"time": "09:30", "activity": "Morning walk", "place": "Specific Park Name"}},
+        "2": {{"time": "11:00", "activity": "Visit museum", "place": "Specific Museum Name"}},
         ...
     }}
     """
