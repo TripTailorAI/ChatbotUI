@@ -25,21 +25,26 @@ def get_place_details(query, location, radius=5000, min_rating=2.5, min_reviews=
     response = requests.get(url, params=params)
     places = response.json().get('results', [])
 
+    # Create a default place details dictionary
+    default_place = {
+        "name": query.split(" in ")[0],
+        "formatted_address": f"{query.split(' in ')[1]}",
+        "rating": "N/A",
+        "user_ratings_total": "N/A",
+        "url": "#"  # Add a default URL
+    }
+
     if not places:
         print(f"No places found for query: {query}")
-        return {"name": query.split(" in ")[0], "formatted_address": f"{query.split(' in ')[1]}", "rating": "N/A", "user_ratings_total": "N/A"}
+        return default_place
 
     # Filter places by minimum rating and minimum number of reviews
     filtered_places = [place for place in places if place.get('rating', 0) >= min_rating and place.get('user_ratings_total', 0) >= min_reviews]
 
     if not filtered_places:
         print(f"No places found with a minimum rating of {min_rating} and a minimum of {min_reviews} reviews for query: {query}")
-        return {
-            "name": query.split(" in ")[0],
-            "formatted_address": f"{query.split(' in ')[1]}",
-            "rating": "N/A",
-            "user_ratings_total": "N/A"
-        }
+        return default_place
+
     # Sort places by number of reviews and rating
     sorted_places = sorted(filtered_places, key=lambda x: (x.get('user_ratings_total', 0), x.get('rating', 0)), reverse=True)
     
@@ -51,17 +56,19 @@ def get_place_details(query, location, radius=5000, min_rating=2.5, min_reviews=
     details_url = f"https://maps.googleapis.com/maps/api/place/details/json"
     details_params = {
         'place_id': place_id,
-        'fields': 'name,formatted_address,type,opening_hours,rating,user_ratings_total, url',
+        'fields': 'name,formatted_address,type,opening_hours,rating,user_ratings_total,url',
         'key': google_places_api_key
     }
     details_response = requests.get(details_url, params=details_params)
     details = details_response.json().get('result', {})
 
-    # Ensure that 'formatted_address' is always present
-    if 'formatted_address' not in details:
-        details['formatted_address'] = f"{query.split(' in ')[1]}"
+    # Ensure all required fields are present
+    for key in default_place.keys():
+        if key not in details:
+            details[key] = default_place[key]
 
     return details
+    
 def get_weather_forecast(city):
     url = f"https://api.weatherapi.com/v1/forecast.json?key={weather_api_key}&q={city}&days=14"
     response = requests.get(url)
@@ -228,6 +235,7 @@ if st.sidebar.button("Generate Itinerary"):
             itineraries = create_travel_itinerary(destination, country, start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d"), hotel_name, purpose_of_stay)
             
             # Create the table data
+            # Create the table data
             table_data = []
             for itinerary in itineraries:
                 for day in itinerary:
@@ -237,9 +245,10 @@ if st.sidebar.button("Generate Itinerary"):
                     for activity in day['activities']:
                         time = activity['time']
                         activity_name = activity['activity']
-                        place_name = activity['place']['name']
-                        address = activity['place']['formatted_address']
-                        opening_hours = activity['opening_hours']
+                        place = activity.get('place', {})
+                        place_name = place.get('name', 'Unknown')
+                        address = place.get('formatted_address', 'Unknown')
+                        opening_hours = activity.get('opening_hours', 'N/A')
                         
                         table_data.append([date, weather, time, activity_name, place_name, address, opening_hours])
             
