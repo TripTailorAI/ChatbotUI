@@ -7,12 +7,16 @@ import google.generativeai as genai
 from datetime import datetime, timedelta
 import traceback
 import time
+import pycountry
 
 # Configure API keys
 GOOGLE_API_KEY = st.secrets['GOOGLE_API_KEY']
 genai.configure(api_key=GOOGLE_API_KEY)
 google_places_api_key = st.secrets['MAPS_API_KEY']
 weather_api_key = st.secrets['WEATHER']
+
+# List of all countries
+countries = sorted([country.name for country in pycountry.countries])
 
 def get_place_details(query, location, radius=5000, min_rating=2.5, min_reviews=5):
     url = "https://maps.googleapis.com/maps/api/place/textsearch/json"
@@ -192,7 +196,7 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
             for i in range(len(verified_itinerary) - 1):
                 origin = verified_itinerary[i]['place']['formatted_address']
                 destination = verified_itinerary[i + 1]['place']['formatted_address']
-                url = f"https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin}&destinations={destination}&key={google_places_api_key}"
+                url = f"https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin}&destinations={destination}&mode={mode_of_transport}&key={google_places_api_key}"
                 response = requests.get(url)
                 distance_data = response.json()
 
@@ -222,19 +226,18 @@ st.title("VoyagerAI")
 st.sidebar.title("Itinerary Generator")
 
 # Input fields
-destination = st.sidebar.text_input("Destination", "Baku")
-country = st.sidebar.text_input("Country", "Azerbaijan")
-start_date = st.sidebar.date_input("Start Date")
+destination = st.sidebar.text_input("Destination", "")
+country = st.sidebar.selectbox("Country", countries)start_date = st.sidebar.date_input("Start Date")
 end_date = st.sidebar.date_input("End Date")
 hotel_name = st.sidebar.text_input("Hotel Name", "Hilton Baku")
 purpose_of_stay = st.sidebar.text_input("Purpose of Stay", "Vacation")
+mode_of_transport = st.sidebar.selectbox("Mode of Transportation", ["driving", "walking", "bicycling", "transit"])
 
 if st.sidebar.button("Generate Itinerary"):
     with st.spinner("Generating itinerary, please wait..."):
         try:
-            itineraries = create_travel_itinerary(destination, country, start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d"), hotel_name, purpose_of_stay)
+            itineraries = create_travel_itinerary(destination, country, start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d"), hotel_name, purpose_of_stay, mode_of_transport)
             
-            # Create the table data
             # Create the table data
             table_data = []
             for itinerary in itineraries:
@@ -251,6 +254,7 @@ if st.sidebar.button("Generate Itinerary"):
                         opening_hours = activity.get('opening_hours', 'N/A')
                         
                         table_data.append([date, weather, time, activity_name, place_name, address, opening_hours])
+            
             
             # Create the DataFrame
             df = pd.DataFrame(table_data, columns=['Date', 'Weather', 'Time', 'Activity', 'Place', 'Address', 'Opening Hours'])
@@ -274,7 +278,7 @@ if st.sidebar.button("Generate Itinerary"):
                                 color = 'yellow'
                             else:
                                 color = 'red'
-                            itinerary_message += f"  - :clock3: Travel time to next location: <font color='{color}'>{activity['duration_to_next']}</font>\n"
+                            itinerary_message += f"  - :clock3: Travel time to next location ({mode_of_transport}): <font color='{color}'>{activity['duration_to_next']}</font>\n"
                     itinerary_message += "---\n\n"
             
             
