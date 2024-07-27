@@ -226,13 +226,13 @@ st.title("VoyagerAI")
 st.sidebar.title("Itinerary Generator")
 
 # Input fields
-destination = st.sidebar.text_input("Destination", "")
-start_date = st.sidebar.date_input("Start Date")
 country = st.sidebar.selectbox("Country", countries)
-end_date = st.sidebar.date_input("End Date")
+destination = st.sidebar.text_input("Destination", "")
 hotel_name = st.sidebar.text_input("Hotel Name", "")
-purpose_of_stay = st.sidebar.selectbox("Purpose of Stay", ["Vacation", "Business"])
+start_date = st.sidebar.date_input("Start Date")
+end_date = st.sidebar.date_input("End Date")
 mode_of_transport = st.sidebar.selectbox("Mode of Transportation", ["driving", "walking", "bicycling", "transit"])
+purpose_of_stay = st.sidebar.selectbox("Purpose of Stay", ["Vacation", "Business"])
 
 if st.sidebar.button("Generate Itinerary"):
     with st.spinner("Generating itinerary, please wait..."):
