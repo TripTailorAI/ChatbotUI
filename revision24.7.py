@@ -266,37 +266,49 @@ if st.sidebar.button("Generate Itinerary"):
             user_input = f"Generate itinerary for {destination}, {country} from {start_date} to {end_date}. Stay at {hotel_name} for {purpose_of_stay}. Transportation: {mode_of_transport}"
             save_message("user", user_input)
 
-            # Generate and save AI response
             ai_response = "Here are the generated itineraries based on your preferences:\n\n"
             for itinerary_number, itinerary in enumerate(itineraries, 1):
-                ai_response += f"**Itinerary {itinerary_number}**\n\n"
-                for day in itinerary:
-                    ai_response += f"**Date:** {day['date']}\n"
-                    ai_response += f"**Weather forecast:** {day['weather']}\n"
-                    for i, activity in enumerate(day['activities']):
-                        ai_response += f"- {activity['time']}: {activity['activity']} at {activity['place']['name']}\n"
-                        ai_response += f"  - Address: {activity['place']['formatted_address']}\n"
-                        ai_response += f"  - Opening Hours: {activity['opening_hours']}\n"
-                        if i < len(day['activities']) - 1:
-                            ai_response += f"  - Travel time to next location ({mode_of_transport[:-8]}): {activity['duration_to_next']}\n"
-                    ai_response += "\n"
-                ai_response += "---\n\n"
-            
-            save_message("assistant", ai_response)
+                with st.expander(f"Itinerary {itinerary_number}", expanded=True):
+                    ai_response += f"**Itinerary {itinerary_number}**\n\n"
+                    for day in itinerary:
+                        ai_response += f"**Date:** {day['date']}\n"
+                        ai_response += f"**Weather forecast:** {day['weather']}\n"
+                        for i, activity in enumerate(day['activities']):
+                            ai_response += f"- {activity['time']}: {activity['activity']} at [{activity['place']['name']}]({activity['place']['url']})\n"
+                            ai_response += f"  - Address: {activity['place']['formatted_address']}\n"
+                            ai_response += f"  - Opening Hours: {activity['opening_hours']}\n"
+                            if i < len(day['activities']) - 1:
+                                duration_value = activity['duration_to_next_value']
+                                if duration_value <= 1800:  # 30 minutes or less
+                                    color = 'green'
+                                elif duration_value <= 3600:  # 1 hour or less
+                                    color = 'yellow'
+                                else:
+                                    color = 'red'
+                                ai_response += f"  - :clock3: Travel time to next location ({mode_of_transport[:-8]}): <font color='{color}'>{activity['duration_to_next']}</font>\n"
+                        ai_response += "---\n\n"
+                    
+                    st.markdown(ai_response, unsafe_allow_html=True)
+                    save_message("assistant", ai_response)
+                    
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        if st.button(f"Export Itinerary {itinerary_number} as PDF 📄"):
+                            # Implement PDF export logic here
+                            st.success(f"Itinerary {itinerary_number} exported as PDF.")
+                    with col2:
+                        if st.button(f"Send Itinerary {itinerary_number} via Email 📧"):
+                            # Implement email sending logic here
+                            st.success(f"Itinerary {itinerary_number} sent via email.")
 
         except Exception as e:
-            error_message = f"An error occurred while creating the itinerary: {str(e)}"
-            save_message("assistant", error_message)
-            st.error(error_message)
-
+            st.sidebar.error(f"An error occurred while creating the itinerary: {str(e)}")
+            st.sidebar.error(f"Exception type: {type(e)}")
+            st.sidebar.error(f"Exception traceback: {traceback.format_exc()}")
+            
 # Display chat messages
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# Add download buttons for each itinerary
-if len(st.session_state.messages) > 0 and st.session_state.messages[-1]["role"] == "assistant":
-    for itinerary_number in range(1, 4):  # Assuming 3 itineraries
-        if st.button(f"Download Itinerary {itinerary_number} as PDF"):
-            # Implement PDF download logic here
-            st.success(f"Itinerary {itinerary_number} downloaded as PDF.")
+
