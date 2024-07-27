@@ -14,8 +14,7 @@ genai.configure(api_key=GOOGLE_API_KEY)
 google_places_api_key = st.secrets['MAPS_API_KEY']
 weather_api_key = st.secrets['WEATHER']
 
-def get_place_details(query, location, radius=5000, min_rating=2.5, min_reviews=5
-):
+def get_place_details(query, location, radius=5000, min_rating=2.5, min_reviews=5):
     url = "https://maps.googleapis.com/maps/api/place/textsearch/json"
     params = {
         'query': query,
@@ -48,7 +47,7 @@ def get_place_details(query, location, radius=5000, min_rating=2.5, min_reviews=
     details_url = f"https://maps.googleapis.com/maps/api/place/details/json"
     details_params = {
         'place_id': place_id,
-        'fields': 'name,formatted_address,type,opening_hours,rating,user_ratings_total',
+        'fields': 'name,formatted_address,type,opening_hours,rating,user_ratings_total, url',
         'key': google_places_api_key
     }
     details_response = requests.get(details_url, params=details_params)
@@ -175,7 +174,23 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
                     'opening_hours': opening_hours
                 })
                 used_places.add(item['place'])  # Add to used places
+                
+            for i in range(len(verified_itinerary) - 1):
+                origin = verified_itinerary[i]['place']['formatted_address']
+                destination = verified_itinerary[i + 1]['place']['formatted_address']
+                url = f"https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin}&destinations={destination}&key={google_places_api_key}"
+                response = requests.get(url)
+                distance_data = response.json()
 
+                if distance_data["status"] == "OK":
+                    duration = distance_data["rows"][0]["elements"][0]["duration"]["text"]
+                    duration_value = distance_data["rows"][0]["elements"][0]["duration"]["value"]
+                    verified_itinerary[i]['duration_to_next'] = duration
+                    verified_itinerary[i]['duration_to_next_value'] = duration_value
+                else:
+                    verified_itinerary[i]['duration_to_next'] = "N/A"
+                    verified_itinerary[i]['duration_to_next_value'] = float('inf')
+                    
             itinerary.append({
                 'date': current_date,
                 'weather': weather_summary,
@@ -231,10 +246,19 @@ if st.sidebar.button("Generate Itinerary"):
                 for day in itinerary:
                     itinerary_message += f"**Date:** {day['date']}\n\n"
                     itinerary_message += f"**Weather forecast:** {day['weather']}\n\n"
-                    for activity in day['activities']:
-                        itinerary_message += f"- {activity['time']}: {activity['activity']} at **{activity['place']['name']}**\n"
+                    for i, activity in enumerate(day['activities']):
+                        itinerary_message += f"- {activity['time']}: {activity['activity']} at [{activity['place']['name']}]({activity['place']['url']})\n"
                         itinerary_message += f"  - Address: {activity['place']['formatted_address']}\n"
                         itinerary_message += f"  - Opening Hours: {activity['opening_hours']}\n"
+                        if i < len(day['activities']) - 1:
+                            duration_value = activity['duration_to_next_value']
+                            if duration_value <= 1800:  # 30 minutes or less
+                                color = 'green'
+                            elif duration_value <= 3600:  # 1 hour or less
+                                color = 'yellow'
+                            else:
+                                color = 'red'
+                            itinerary_message += f"  - :clock3: Travel time to next location: <font color='{color}'>{activity['duration_to_next']}</font>\n"
                     itinerary_message += "---\n\n"
             
             
@@ -253,7 +277,7 @@ if st.sidebar.button("Generate Itinerary"):
             
             # Display the table
             #st.table(df)
-            st.markdown(itinerary_message)
+            st.markdown(itinerary_message, unsafe_allow_html=True)
 
         except Exception as e:
             st.sidebar.error(f"An error occurred while creating the itinerary: {str(e)}")
