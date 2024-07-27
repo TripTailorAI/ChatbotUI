@@ -257,22 +257,27 @@ transport_modes = {
 mode_of_transport = st.sidebar.selectbox("🚀 Mode of Transportation", list(transport_modes.keys()))
 mode_of_transport_value = transport_modes[mode_of_transport]
 
+# Display chat messages
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+        
 if st.sidebar.button("Generate Itinerary"):
-    with st.spinner("Generating itinerary, please wait..."):
-        try:
-            itineraries = create_travel_itinerary(destination, country, start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d"), hotel_name, purpose_of_stay, mode_of_transport_value)
-            
-            # Save user input as a message
-            user_input = f"Generate itinerary for {destination}, {country} from {start_date} to {end_date}. Stay at {hotel_name} for {purpose_of_stay}. Transportation: {mode_of_transport}"
-            save_message("user", user_input)
+    # Save user input as a message
+    user_input = f"Generate itinerary for {destination}, {country} from {start_date} to {end_date}. Stay at {hotel_name} for {purpose_of_stay}. Transportation: {mode_of_transport}"
+    save_message("user", user_input)
 
-            ai_response = "Here are the generated itineraries based on your preferences:\n\n"
-            for itinerary_number, itinerary in enumerate(itineraries, 1):
-                with st.expander(f"Itinerary {itinerary_number}", expanded=True):
+    with st.chat_message("assistant"):
+        with st.spinner("Generating itinerary, please wait..."):
+            try:
+                itineraries = create_travel_itinerary(destination, country, start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d"), hotel_name, purpose_of_stay, mode_of_transport_value)
+                
+                ai_response = "Here are the generated itineraries based on your preferences:\n\n"
+                for itinerary_number, itinerary in enumerate(itineraries, 1):
                     ai_response += f"**Itinerary {itinerary_number}**\n\n"
                     for day in itinerary:
                         ai_response += f"**Date:** {day['date']}\n"
-                        ai_response += f"**Weather forecast:** {day['weather']}\n"
+                        ai_response += f"**Weather forecast:** {day['weather']}\n\n"
                         for i, activity in enumerate(day['activities']):
                             ai_response += f"- {activity['time']}: {activity['activity']} at [{activity['place']['name']}]({activity['place']['url']})\n"
                             ai_response += f"  - Address: {activity['place']['formatted_address']}\n"
@@ -285,12 +290,15 @@ if st.sidebar.button("Generate Itinerary"):
                                     color = 'yellow'
                                 else:
                                     color = 'red'
-                                ai_response += f"  - :clock3: Travel time to next location ({mode_of_transport[:-8]}): <font color='{color}'>{activity['duration_to_next']}</font>\n"
-                        ai_response += "---\n\n"
-                    
-                    st.markdown(ai_response, unsafe_allow_html=True)
-                    save_message("assistant", ai_response)
-                    
+                                ai_response += f"  - Travel time to next location ({mode_of_transport[:-8]}): {activity['duration_to_next']}\n"
+                        ai_response += "\n"
+                    ai_response += "---\n\n"
+                
+                st.markdown(ai_response, unsafe_allow_html=True)
+                save_message("assistant", ai_response)
+
+                # Add download buttons for each itinerary
+                for itinerary_number in range(1, 4):  # Assuming 3 itineraries
                     col1, col2 = st.columns(2)
                     with col1:
                         if st.button(f"Export Itinerary {itinerary_number} as PDF 📄"):
@@ -301,14 +309,13 @@ if st.sidebar.button("Generate Itinerary"):
                             # Implement email sending logic here
                             st.success(f"Itinerary {itinerary_number} sent via email.")
 
-        except Exception as e:
-            st.sidebar.error(f"An error occurred while creating the itinerary: {str(e)}")
-            st.sidebar.error(f"Exception type: {type(e)}")
-            st.sidebar.error(f"Exception traceback: {traceback.format_exc()}")
+            except Exception as e:
+                error_message = f"An error occurred while creating the itinerary: {str(e)}"
+                st.error(error_message)
+                save_message("assistant", error_message)
+                st.sidebar.error(f"Exception type: {type(e)}")
+                st.sidebar.error(f"Exception traceback: {traceback.format_exc()}")
             
-# Display chat messages
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+
 
 
