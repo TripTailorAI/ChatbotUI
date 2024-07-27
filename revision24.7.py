@@ -150,7 +150,7 @@ def get_place_opening_hours(place, date):
 
     return "Closed"
 
-def create_travel_itinerary(destination, country, start_date, end_date, hotel_name, purpose_of_stay):
+def create_travel_itinerary(destination, country, start_date, end_date, hotel_name, purpose_of_stay, mode_of_transport):
     weather_forecast_data = get_weather_forecast(destination)
     num_days = (pd.to_datetime(end_date) - pd.to_datetime(start_date)).days + 1
     all_itineraries = []
@@ -226,18 +226,25 @@ st.title("VoyagerAI")
 st.sidebar.title("Itinerary Generator")
 
 # Input fields
-country = st.sidebar.selectbox("Country", countries)
-destination = st.sidebar.text_input("Destination", "")
-hotel_name = st.sidebar.text_input("Hotel Name", "")
-start_date = st.sidebar.date_input("Start Date")
-end_date = st.sidebar.date_input("End Date")
-mode_of_transport = st.sidebar.selectbox("Mode of Transportation", ["driving", "walking", "bicycling", "transit"])
-purpose_of_stay = st.sidebar.selectbox("Purpose of Stay", ["Vacation", "Business"])
+country = st.sidebar.selectbox("🏳️ Country", countries)
+destination = st.sidebar.text_input("🏙️ Destination", "")
+hotel_name = st.sidebar.text_input("🏨 Hotel Name", "")
+start_date = st.sidebar.date_input("🗓️ Start Date")
+end_date = st.sidebar.date_input("🗓️ End Date")
+purpose_of_stay = st.sidebar.selectbox("🎯 Purpose of Stay", ["Vacation", "Business"])
+transport_modes = {
+    "🚗 Driving": "driving",
+    "🚶 Walking": "walking",
+    "🚲 Bicycling": "bicycling",
+    "🚊 Transit": "transit"
+}
+mode_of_transport = st.sidebar.selectbox("🚀 Mode of Transportation", list(transport_modes.keys()))
+mode_of_transport_value = transport_modes[mode_of_transport]
 
 if st.sidebar.button("Generate Itinerary"):
     with st.spinner("Generating itinerary, please wait..."):
         try:
-            itineraries = create_travel_itinerary(destination, country, start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d"), hotel_name, purpose_of_stay, mode_of_transport)
+            itineraries = create_travel_itinerary(destination, country, start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d"), hotel_name, purpose_of_stay, mode_of_transport_value)
             
             # Create the table data
             table_data = []
@@ -284,11 +291,11 @@ if st.sidebar.button("Generate Itinerary"):
             
             
             # Export and email functionality
-            if st.button("Export as PDF"):
+            if st.button("Export as PDF 📄"):
                 # Implement PDF export logic here
                 st.success("Itinerary exported as PDF.")
             
-            if st.button("Send PDF via Email"):
+            if st.button("Send PDF via Email 📧"):
                 # Implement email sending logic here
                 st.success("PDF sent via email.")
             
