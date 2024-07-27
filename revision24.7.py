@@ -228,7 +228,7 @@ st.sidebar.title("Itinerary Generator")
 # Input fields
 destination = st.sidebar.text_input("Destination", "")
 start_date = st.sidebar.date_input("Start Date")
-country = st.sidebar.selectbox("Country", countries)start_date = st.sidebar.date_input("Start Date")
+country = st.sidebar.selectbox("Country", countries)
 end_date = st.sidebar.date_input("End Date")
 hotel_name = st.sidebar.text_input("Hotel Name", "")
 purpose_of_stay = st.sidebar.selectbox("Purpose of Stay", ["Vacation", "Business"])
