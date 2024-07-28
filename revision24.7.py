@@ -9,17 +9,6 @@ import traceback
 import time
 import pycountry
 
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-# Function to save messages
-def save_message(role, content):
-    st.session_state.messages.append({
-        "role": role,
-        "content": content,
-        "timestamp": datetime.now().isoformat()
-    })
-    
 # Configure API keys
 GOOGLE_API_KEY = st.secrets['GOOGLE_API_KEY']
 genai.configure(api_key=GOOGLE_API_KEY)
@@ -240,7 +229,7 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
     return all_itineraries
 
 # Streamlit app
-st.title("VoyagerAI 🌍✈️")
+st.title("VoyagerAI")
 
 # Sidebar for itinerary generation
 st.sidebar.title("Itinerary Generator")
@@ -261,37 +250,37 @@ transport_modes = {
 mode_of_transport = st.sidebar.selectbox("🚀 Mode of Transportation", list(transport_modes.keys()))
 mode_of_transport_value = transport_modes[mode_of_transport]
 
-# Display chat messages
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
-        
-def display_chat_messages():
-    # Sort messages by timestamp in descending order (newest first)
-    sorted_messages = sorted(st.session_state.messages, key=lambda x: x['timestamp'], reverse=True)
-    
-    for message in sorted_messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
-            
-display_chat_messages()
-
 if st.sidebar.button("Generate Itinerary"):
     with st.spinner("Generating itinerary, please wait..."):
         try:
             itineraries = create_travel_itinerary(destination, country, start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d"), hotel_name, purpose_of_stay, mode_of_transport_value)
             
-            # Save user's request as a message
-            user_request = f"Generate itinerary for {destination}, {country} from {start_date} to {end_date}"
-            save_message("user", user_request)
-
+            # Create the table data
+            table_data = []
+            for itinerary in itineraries:
+                for day in itinerary:
+                    date = day['date']
+                    weather = day['weather']
+                    
+                    for activity in day['activities']:
+                        time = activity['time']
+                        activity_name = activity['activity']
+                        place_name = activity['place']['name']
+                        address = activity['place']['formatted_address']
+                        opening_hours = activity['opening_hours']
+                        
+                        
+                        table_data.append([date, weather, time, activity_name, place_name, address, opening_hours])
+            
+            # Create the DataFrame
+            df = pd.DataFrame(table_data, columns=['Date', 'Weather', 'Time', 'Activity', 'Place', 'Address', 'Opening Hours'])
             # Display the AI agent's response
-            ai_response = "Here are the generated itineraries based on your preferences:"
-            save_message("assistant", ai_response)
+            st.subheader("VoyagerAI's Response")
+            st.write("Here are the generated itineraries based on your preferences:")
 
             for itinerary_number, itinerary in enumerate(itineraries, 1):
                 with st.expander(f"Itinerary {itinerary_number}", expanded=True):
-                    itinerary_message = f"**Itinerary {itinerary_number}**\n\n"
+                    itinerary_message = ""
                     for day in itinerary:
                         itinerary_message += f"**Date:** {day['date']}\n\n"
                         itinerary_message += f"**Weather forecast:** {day['weather']}\n\n"
@@ -311,31 +300,18 @@ if st.sidebar.button("Generate Itinerary"):
                         itinerary_message += "---\n\n"
                     
                     st.markdown(itinerary_message, unsafe_allow_html=True)
-                    save_message("assistant", itinerary_message)
-                    
+                    #st.table(df)
                     col1, col2 = st.columns(2)
                     with col1:
                         if st.button(f"Export Itinerary {itinerary_number} as PDF 📄"):
                             # Implement PDF export logic here
-                            export_message = f"Itinerary {itinerary_number} exported as PDF."
-                            st.success(export_message)
-                            save_message("assistant", export_message)
+                            st.success(f"Itinerary {itinerary_number} exported as PDF.")
                     with col2:
                         if st.button(f"Send Itinerary {itinerary_number} via Email 📧"):
                             # Implement email sending logic here
-                            email_message = f"Itinerary {itinerary_number} sent via email."
-                            st.success(email_message)
-                            save_message("assistant", email_message)
+                            st.success(f"Itinerary {itinerary_number} sent via email.")
 
         except Exception as e:
-            error_message = f"An error occurred while creating the itinerary: {str(e)}"
-            st.sidebar.error(error_message)
+            st.sidebar.error(f"An error occurred while creating the itinerary: {str(e)}")
             st.sidebar.error(f"Exception type: {type(e)}")
             st.sidebar.error(f"Exception traceback: {traceback.format_exc()}")
-            save_message("assistant", error_message)
-
-    # Rerun the app to display the new messages
-    st.experimental_rerun()
-
-
-
