@@ -238,18 +238,18 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
                     verified_itinerary[i]['duration_to_next'] = f"API Error: {distance_data['status']}"
                     verified_itinerary[i]['duration_to_next_value'] = float('inf')
 
-verified_itinerary[-1]['duration_to_next'] = "N/A"
-verified_itinerary[-1]['duration_to_next_value'] = 0
+                    verified_itinerary[-1]['duration_to_next'] = "N/A"
+                    verified_itinerary[-1]['duration_to_next_value'] = 0
+                                        
+                                itinerary.append({
+                                    'date': current_date,
+                                    'weather': weather_summary,
+                                    'activities': verified_itinerary
+                                })
                     
-            itinerary.append({
-                'date': current_date,
-                'weather': weather_summary,
-                'activities': verified_itinerary
-            })
-
-        all_itineraries.append(itinerary)
-
-    return all_itineraries
+                            all_itineraries.append(itinerary)
+                    
+                        return all_itineraries
 
 # Streamlit app
 st.title("VoyagerAI🌎")
