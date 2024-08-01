@@ -163,6 +163,7 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
     all_itineraries = []
     start_date_dt = pd.to_datetime(start_date)
     all_used_places = set()  # Track used places across all itineraries
+    distance_data = '' #added 2024-08-02 bY kd for transit error
 
     for itinerary_version in range(3):
         itinerary = []
