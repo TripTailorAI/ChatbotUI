@@ -216,27 +216,30 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
                 url = f"https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin}&destinations={destination}&mode={mode_of_transport}&key={google_places_api_key}"
                 response = requests.get(url)
                 distance_data = response.json()
-
-            if distance_data["status"] == "OK":
-                if (distance_data.get("rows") and
-                    distance_data["rows"][0].get("elements") and
-                    distance_data["rows"][0]["elements"][0].get("status") == "OK"):
-
-                    element = distance_data["rows"][0]["elements"][0]
-                    if "duration" in element:
-                        duration = element["duration"]["text"]
-                        duration_value = element["duration"]["value"]
-                        verified_itinerary[i]['duration_to_next'] = duration
-                        verified_itinerary[i]['duration_to_next_value'] = duration_value
+            
+                if distance_data["status"] == "OK":
+                    if (distance_data.get("rows") and
+                        distance_data["rows"][0].get("elements") and
+                        distance_data["rows"][0]["elements"][0].get("status") == "OK"):
+            
+                        element = distance_data["rows"][0]["elements"][0]
+                        if "duration" in element:
+                            duration = element["duration"]["text"]
+                            duration_value = element["duration"]["value"]
+                            verified_itinerary[i]['duration_to_next'] = duration
+                            verified_itinerary[i]['duration_to_next_value'] = duration_value
+                        else:
+                            verified_itinerary[i]['duration_to_next'] = "Unable to calculate duration"
+                            verified_itinerary[i]['duration_to_next_value'] = float('inf')
                     else:
-                        verified_itinerary[i]['duration_to_next'] = "Unable to calculate duration"
+                        verified_itinerary[i]['duration_to_next'] = "Route not found"
                         verified_itinerary[i]['duration_to_next_value'] = float('inf')
                 else:
-                    verified_itinerary[i]['duration_to_next'] = "Route not found"
+                    verified_itinerary[i]['duration_to_next'] = f"API Error: {distance_data['status']}"
                     verified_itinerary[i]['duration_to_next_value'] = float('inf')
-            else:
-                verified_itinerary[i]['duration_to_next'] = f"API Error: {distance_data['status']}"
-                verified_itinerary[i]['duration_to_next_value'] = float('inf')
+
+verified_itinerary[-1]['duration_to_next'] = "N/A"
+verified_itinerary[-1]['duration_to_next_value'] = 0
                     
             itinerary.append({
                 'date': current_date,
@@ -321,22 +324,23 @@ if st.sidebar.button("Generate Itinerary"):
                         itinerary_message += f"**Date:** {day['date']}\n\n"
                         itinerary_message += f"**Weather forecast:** {day['weather']}\n\n"
                         for i, activity in enumerate(day['activities']):
-                            itinerary_message += f"- {activity['time']}: {activity['activity']} at [{activity['place']['name']}]({activity['place']['url']})\n"
+                            itinerary_message += f"- {activity['time']}: {activity['activity']} at [{activity['place']['name']}]({activity['place'].get('url', '#')})\n"
                             itinerary_message += f"  - Address: {activity['place']['formatted_address']}\n"
-                            itinerary_message += f"  - Opening Hours: {activity['opening_hours']}\n"
+                            itinerary_message += f"  - Opening Hours: {activity.get('opening_hours', 'N/A')}\n"
                             if i < len(day['activities']) - 1:
-                                duration_value = activity['duration_to_next_value']
+                                duration_value = activity.get('duration_to_next_value', float('inf'))
+                                duration_text = activity.get('duration_to_next', 'N/A')
                                 if duration_value <= 1800:  # 30 minutes or less
                                     color = 'green'
                                 elif duration_value <= 3600:  # 1 hour or less
                                     color = 'yellow'
                                 else:
                                     color = 'red'
-                                itinerary_message += f"  - :clock3: Travel time to next location ({mode_of_transport[:-8]}): <font color='{color}'>{activity['duration_to_next']}</font>\n"
+                                itinerary_message += f"  - :clock3: Travel time to next location ({mode_of_transport[:-8]}): <font color='{color}'>{duration_text}</font>\n"
                         itinerary_message += "---\n\n"
                     
                     st.markdown(itinerary_message, unsafe_allow_html=True)
-
+                    
                     if st.sidebar.button("Export All Itineraries"):
                         # Implement the export logic here
                         st.sidebar.success("All itineraries exported successfully!")
