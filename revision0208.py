@@ -211,11 +211,11 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
                 used_places.add(item['place'])
                 
             for i in range(len(verified_itinerary) - 1):
-            origin = verified_itinerary[i]['place']['formatted_address']
-            destination = verified_itinerary[i + 1]['place']['formatted_address']
-            url = f"https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin}&destinations={destination}&mode={mode_of_transport}&key={google_places_api_key}"
-            response = requests.get(url)
-            distance_data = response.json()
+                origin = verified_itinerary[i]['place']['formatted_address']
+                destination = verified_itinerary[i + 1]['place']['formatted_address']
+                url = f"https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin}&destinations={destination}&mode={mode_of_transport}&key={google_places_api_key}"
+                response = requests.get(url)
+                distance_data = response.json()
 
             if distance_data["status"] == "OK":
                 if (distance_data.get("rows") and
