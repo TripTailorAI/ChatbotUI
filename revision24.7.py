@@ -210,7 +210,7 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
                 distance_data = response.json()
 
                 if distance_data["status"] == "OK":
-                    duration = distance_data["rows"][0]["elements"][0]["duration"]["value"]
+                    duration = distance_data["rows"][0]["elements"][0]["duration"]["text"]
                     duration_value = distance_data["rows"][0]["elements"][0]["duration"]["value"]
                     verified_itinerary[i]['duration_to_next'] = duration
                     verified_itinerary[i]['duration_to_next_value'] = duration_value
