@@ -95,7 +95,7 @@ def get_daily_itinerary(destination, country, date, hotel_name, purpose_of_stay,
     Weather forecast: {weather_forecast}
     Mode of transportation: {mode_of_transport}
 
-    Please provide a full day's itinerary with suggested times for each activity. Include local meals, sightseeing, and other relevant activities.
+    Please provide a full days itinerary with suggested times for each activity. Include local meals, sightseeing, and other relevant activities.
     Be specific with place names and try to suggest a variety of activities suitable for the destination, weather, and transportation mode.
 
     Important guidelines:
