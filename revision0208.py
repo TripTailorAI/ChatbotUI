@@ -212,36 +212,39 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
                 all_used_places.add(item['place'])  # Add to all used places
                 used_places.add(item['place'])
                 
-            for i in range(len(verified_itinerary) - 1):
-                origin = verified_itinerary[i]['place']['formatted_address']
-                destination = verified_itinerary[i + 1]['place']['formatted_address']
-                url = f"https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin}&destinations={destination}&mode={mode_of_transport}&key={google_places_api_key}"
-                response = requests.get(url)
-                distance_data = response.json()
-            
-                if distance_data["status"] == "OK":
-                    if (distance_data.get("rows") and
-                        distance_data["rows"][0].get("elements") and
-                        distance_data["rows"][0]["elements"][0].get("status") == "OK"):
-            
-                        element = distance_data["rows"][0]["elements"][0]
-                        if "duration" in element:
-                            duration = element["duration"]["text"]
-                            duration_value = element["duration"]["value"]
-                            verified_itinerary[i]['duration_to_next'] = duration
-                            verified_itinerary[i]['duration_to_next_value'] = duration_value
+            # Only process travel times if there are activities
+            if verified_itinerary:
+                for i in range(len(verified_itinerary) - 1):
+                    origin = verified_itinerary[i]['place']['formatted_address']
+                    destination = verified_itinerary[i + 1]['place']['formatted_address']
+                    url = f"https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin}&destinations={destination}&mode={mode_of_transport}&key={google_places_api_key}"
+                    response = requests.get(url)
+                    distance_data = response.json()
+                
+                    if distance_data["status"] == "OK":
+                        if (distance_data.get("rows") and
+                            distance_data["rows"][0].get("elements") and
+                            distance_data["rows"][0]["elements"][0].get("status") == "OK"):
+                
+                            element = distance_data["rows"][0]["elements"][0]
+                            if "duration" in element:
+                                duration = element["duration"]["text"]
+                                duration_value = element["duration"]["value"]
+                                verified_itinerary[i]['duration_to_next'] = duration
+                                verified_itinerary[i]['duration_to_next_value'] = duration_value
+                            else:
+                                verified_itinerary[i]['duration_to_next'] = "Unable to calculate duration"
+                                verified_itinerary[i]['duration_to_next_value'] = float('inf')
                         else:
-                            verified_itinerary[i]['duration_to_next'] = "Unable to calculate duration"
+                            verified_itinerary[i]['duration_to_next'] = "Route not found"
                             verified_itinerary[i]['duration_to_next_value'] = float('inf')
                     else:
-                        verified_itinerary[i]['duration_to_next'] = "Route not found"
+                        verified_itinerary[i]['duration_to_next'] = f"API Error: {distance_data['status']}"
                         verified_itinerary[i]['duration_to_next_value'] = float('inf')
-                else:
-                    verified_itinerary[i]['duration_to_next'] = f"API Error: {distance_data['status']}"
-                    verified_itinerary[i]['duration_to_next_value'] = float('inf')
 
-            verified_itinerary[-1]['duration_to_next'] = "N/A"
-            verified_itinerary[-1]['duration_to_next_value'] = 0
+                # Set the last activity's duration to "N/A" only if there are activities
+                verified_itinerary[-1]['duration_to_next'] = "N/A"
+                verified_itinerary[-1]['duration_to_next_value'] = 0
                     
             itinerary.append({
                 'date': current_date,
