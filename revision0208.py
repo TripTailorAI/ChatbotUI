@@ -341,7 +341,7 @@ if st.sidebar.button("Generate Itinerary"):
                     
                     st.markdown(itinerary_message, unsafe_allow_html=True)
                     
-                    if st.sidebar.button("Export All Itineraries"):
+                    if st.sidebar.button("Export All Itineraries", key="export_all_itineraries"):
                         # Implement the export logic here
                         st.sidebar.success("All itineraries exported successfully!")
         
@@ -354,11 +354,11 @@ if st.sidebar.button("Generate Itinerary"):
                     #st.table(df)
                     col1, col2 = st.columns(2)
                     with col1:
-                        if st.button(f"Export Itinerary {itinerary_number} as PDF 📄"):
+                        if st.button(f"Export Itinerary {itinerary_number} as PDF 📄", key=f"export_pdf_{itinerary_number}"):
                             # Implement PDF export logic here
                             st.success(f"Itinerary {itinerary_number} exported as PDF.")
                     with col2:
-                        if st.button(f"Send Itinerary {itinerary_number} via Email 📧"):
+                        if st.button(f"Send Itinerary {itinerary_number} via Email 📧", key=f"send_email_{itinerary_number}"):
                             # Implement email sending logic here
                             st.success(f"Itinerary {itinerary_number} sent via email.")
                     
