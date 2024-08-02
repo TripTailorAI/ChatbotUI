@@ -408,8 +408,3 @@ if st.session_state.generated_itineraries:
                         if st.button(f"Send Itinerary {itinerary_number} via Email 📧", key=f"send_email_{itinerary_number}"):
                             # Implement email sending logic here
                             st.success(f"Itinerary {itinerary_number} sent via email.")
-                    
-        except Exception as e:
-            st.sidebar.error(f"An error occurred while creating the itinerary: {str(e)}")
-            st.sidebar.error(f"Exception type: {type(e)}")
-            st.sidebar.error(f"Exception traceback: {traceback.format_exc()}")
