@@ -1,4 +1,4 @@
-
+import streamlit as st
 import requests
 import json
 import pandas as pd
@@ -8,15 +8,17 @@ from datetime import datetime, timedelta
 import traceback
 import time
 import pycountry
-from google.colab import userdata
-import logging
 
-logging.basicConfig(level=logging.INFO)
+#COLAB
+# from google.colab import userdata
+# import logging
+# logging.basicConfig(level=logging.INFO)
+# Configure API keys
 
-# Configure API keys (you'll need to set these in Colab)
-GOOGLE_API_KEY = userdata.get('GOOGLE_API_KEY')
-genai.configure(api_key=GOOGLE_API_KEY)
-google_places_api_key = userdata.get('MAPS_API_KEY')
+#COLAB
+# GOOGLE_API_KEY = userdata.get('GOOGLE_API_KEY')
+# genai.configure(api_key=GOOGLE_API_KEY)
+# google_places_api_key = userdata.get('MAPS_API_KEY')
 weather_api_key = userdata.get('WEATHER')
 
 # List of all countries
@@ -123,6 +125,7 @@ def get_daily_itinerary(destination, country, date, hotel_name, purpose_of_stay,
     }}
     """
 
+
     model = genai.GenerativeModel('gemini-1.5-flash')
     response = model.generate_content(user_message)
     # print(response)
@@ -156,6 +159,7 @@ def get_place_opening_hours(place, date):
             return f"{open_time} - {close_time}"
 
     return "Closed"
+    
 def create_travel_itinerary(destination, country, start_date, end_date, hotel_name, purpose_of_stay, mode_of_transport):
     weather_forecast_data = get_weather_forecast(destination)
     num_days = (pd.to_datetime(end_date) - pd.to_datetime(start_date)).days + 1

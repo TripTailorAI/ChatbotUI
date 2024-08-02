@@ -9,11 +9,21 @@ import traceback
 import time
 import pycountry
 
+#COLAB
+# from google.colab import userdata
+# import logging
+# logging.basicConfig(level=logging.INFO)
 # Configure API keys
 GOOGLE_API_KEY = st.secrets['GOOGLE_API_KEY']
 genai.configure(api_key=GOOGLE_API_KEY)
 google_places_api_key = st.secrets['MAPS_API_KEY']
 weather_api_key = st.secrets['WEATHER']
+
+#COLAB
+# GOOGLE_API_KEY = userdata.get('GOOGLE_API_KEY')
+# genai.configure(api_key=GOOGLE_API_KEY)
+# google_places_api_key = userdata.get('MAPS_API_KEY')
+# weather_api_key = userdata.get('WEATHER')
 
 # Initialize session state for message history
 if 'messages' not in st.session_state:
@@ -258,6 +268,9 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
         all_itineraries.append(itinerary)
                     
     return all_itineraries
+
+#COLAB
+# def print_itineraries(itineraries):
 
 # Streamlit app
 st.title("VoyagerAI🌎")
