@@ -316,7 +316,11 @@ if st.sidebar.button("Generate Itinerary"):
             # Display the AI agent's response
             st.subheader("VoyagerAI's Response")
             st.write("Here are the generated itineraries based on your preferences:")
-
+            
+            if st.sidebar.button("Export All Itineraries", key="export_all_itineraries"):
+                        # Implement the export logic here
+                        st.sidebar.success("All itineraries exported successfully!")
+                
             for itinerary_number, itinerary in enumerate(itineraries, 1):
                 with st.expander(f"Itinerary {itinerary_number}", expanded=True):
                     itinerary_message = ""
@@ -341,9 +345,6 @@ if st.sidebar.button("Generate Itinerary"):
                     
                     st.markdown(itinerary_message, unsafe_allow_html=True)
                     
-                    if st.sidebar.button("Export All Itineraries", key="export_all_itineraries"):
-                        # Implement the export logic here
-                        st.sidebar.success("All itineraries exported successfully!")
         
                     # Add the generated itineraries to the message history
                     st.session_state.messages.append({
