@@ -241,15 +241,15 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
                     verified_itinerary[-1]['duration_to_next'] = "N/A"
                     verified_itinerary[-1]['duration_to_next_value'] = 0
                                         
-                                itinerary.append({
-                                    'date': current_date,
-                                    'weather': weather_summary,
-                                    'activities': verified_itinerary
-                                })
+                    itinerary.append({
+                        'date': current_date,
+                        'weather': weather_summary,
+                        'activities': verified_itinerary
+                    })
+        
+                all_itineraries.append(itinerary)
                     
-                            all_itineraries.append(itinerary)
-                    
-                        return all_itineraries
+            return all_itineraries
 
 # Streamlit app
 st.title("VoyagerAI🌎")
