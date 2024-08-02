@@ -414,7 +414,7 @@ if st.session_state.generated_itineraries:
     
     # Display the table
     st.subheader("Itinerary Overview")
-    st.dataframe(df)
+    #st.dataframe(df)
     
     if st.sidebar.button("Export All Itineraries", key="export_all_itineraries"):
         # Implement the export logic here
