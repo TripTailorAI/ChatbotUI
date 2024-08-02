@@ -162,6 +162,9 @@ def get_place_opening_hours(place, date):
     for period in place['opening_hours']['periods']:
         if period['open']['day'] == day_of_week:
             open_time = datetime.strptime(period['open']['time'], "%H%M").strftime("%I:%M %p")
+            if 'close' not in period:
+                # Place might be open 24/7
+                return f"{open_time} - Open 24 hours"
             close_time = datetime.strptime(period['close']['time'], "%H%M").strftime("%I:%M %p")
             return f"{open_time} - {close_time}"
 
