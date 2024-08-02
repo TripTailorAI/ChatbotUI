@@ -170,7 +170,6 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
     all_itineraries = []
     start_date_dt = pd.to_datetime(start_date)
     all_used_places = set()  # Track used places across all itineraries
-    distance_data = '' #added 2024-08-02 bY kd for transit error
 
     for itinerary_version in range(3):
         itinerary = []
@@ -238,18 +237,18 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
                     verified_itinerary[i]['duration_to_next'] = f"API Error: {distance_data['status']}"
                     verified_itinerary[i]['duration_to_next_value'] = float('inf')
 
-                    verified_itinerary[-1]['duration_to_next'] = "N/A"
-                    verified_itinerary[-1]['duration_to_next_value'] = 0
-                                        
-                    itinerary.append({
-                        'date': current_date,
-                        'weather': weather_summary,
-                        'activities': verified_itinerary
-                    })
-        
-                all_itineraries.append(itinerary)
+            verified_itinerary[-1]['duration_to_next'] = "N/A"
+            verified_itinerary[-1]['duration_to_next_value'] = 0
                     
-            return all_itineraries
+            itinerary.append({
+                'date': current_date,
+                'weather': weather_summary,
+                'activities': verified_itinerary
+            })
+        
+        all_itineraries.append(itinerary)
+                    
+    return all_itineraries
 
 # Streamlit app
 st.title("VoyagerAI🌎")
