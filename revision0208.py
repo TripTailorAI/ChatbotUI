@@ -413,7 +413,7 @@ if st.session_state.generated_itineraries:
     df = pd.DataFrame(table_data, columns=['Date', 'Weather', 'Time', 'Activity', 'Place', 'Address', 'Opening Hours'])
     
     # Display the table
-    st.subheader("Itinerary Overview")
+    #st.subheader("Itinerary Overview")
     #st.dataframe(df)
     
     if st.sidebar.button("Export All Itineraries", key="export_all_itineraries"):
