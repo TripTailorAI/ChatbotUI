@@ -425,5 +425,4 @@ if st.session_state.generated_itineraries:
         "role": "assistant",
         "content": f"Generated {len(st.session_state.generated_itineraries)} itineraries for {destination}, {country}"
     })
-                            # Implement email sending logic here
-                            st.success(f"Itinerary {itinerary_number} sent via email.")
+                            
