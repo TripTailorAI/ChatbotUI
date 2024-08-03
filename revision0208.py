@@ -91,17 +91,23 @@ def get_place_details(query, location, radius=5000, min_rating=2.5, min_reviews=
 
     return details
 
+@st.cache_data(ttl=7200)    
 def get_weather_forecast(city):
     url = f"https://api.weatherapi.com/v1/forecast.json?key={weather_api_key}&q={city}&days=14"
-    response = requests.get(url)
-
     try:
-        return response.json()
-    except requests.exceptions.JSONDecodeError as e:
-        print(f"Error decoding JSON response from weather API for city: {city}")
-        print(f"Response status code: {response.status_code}")
-        print(f"Response content: {response.content}")
-        raise e
+        response = requests.get(url)
+        response.raise_for_status()  # Raises an HTTPError for bad responses
+        data = response.json()
+        if 'forecast' not in data:
+            print(f"Unexpected response structure from weather API for city: {city}")
+            print(f"Response content: {data}")
+            return {"error": "Unexpected response structure from weather API"}
+        return data
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching weather data for city: {city}")
+        print(f"Exception: {str(e)}")
+        return {"error": f"Failed to fetch weather data: {str(e)}"}
+
 
 def get_daily_itinerary(destination, country, date, hotel_name, purpose_of_stay, weather_forecast, day_number, trip_length, used_places, mode_of_transport, custom_preferences):
     used_places_str = ", ".join(used_places)
