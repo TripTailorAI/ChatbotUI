@@ -31,7 +31,13 @@ if 'messages' not in st.session_state:
 
 if 'generated_itineraries' not in st.session_state:
     st.session_state.generated_itineraries = None
-    
+
+if 'all_generated_itineraries' not in st.session_state:
+    st.session_state.all_generated_itineraries = []
+
+if 'itinerary_set_count' not in st.session_state:
+    st.session_state.itinerary_set_count = 0
+
 # List of all countries
 countries = sorted([country.name for country in pycountry.countries])
 
@@ -352,67 +358,69 @@ custom_preferences = st.sidebar.text_area("✨ Custom Preferences",
 if st.sidebar.button("Generate Itinerary"):
     with st.spinner("Generating itinerary, please wait..."):
         try:
-            st.session_state.generated_itineraries = create_travel_itinerary(
+            new_itineraries = create_travel_itinerary(
                 destination, country, start_date.strftime("%Y-%m-%d"), 
                 end_date.strftime("%Y-%m-%d"), hotel_name, purpose_of_stay, 
                 mode_of_transport_value, custom_preferences
             )
-            st.success("Itineraries generated successfully!")
+            st.session_state.all_generated_itineraries.append(new_itineraries)
+            st.session_state.itinerary_set_count += 1
+            st.success(f"Itinerary set {st.session_state.itinerary_set_count} generated successfully!")
         except Exception as e:
             st.sidebar.error(f"An error occurred while creating the itinerary: {str(e)}")
             st.sidebar.error(f"Exception type: {type(e)}")
             st.sidebar.error(f"Exception traceback: {traceback.format_exc()}")
 
-if st.session_state.generated_itineraries:
+if st.session_state.all_generated_itineraries:
     st.subheader("VoyagerAI's Response")
-    st.write("Here are the generated itineraries based on your preferences:")
+    st.write("Here are all the generated itinerary sets based on your preferences:")
     
     # Create the table data
     table_data = []
-    for itinerary_number, itinerary in enumerate(st.session_state.generated_itineraries, 1):
-        with st.expander(f"Itinerary {itinerary_number}", expanded=True):
-            itinerary_message = ""
-            for day in itinerary:
-                date = day['date']
-                weather = day['weather']
-                itinerary_message += f"**Date:** {date}\n\n"
-                itinerary_message += f"**Weather forecast:** {weather}\n\n"
-                for i, activity in enumerate(day['activities']):
-                    time = activity['time']
-                    activity_name = activity['activity']
-                    place_name = activity['place']['name']
-                    address = activity['place']['formatted_address']
-                    opening_hours = activity.get('opening_hours', 'N/A')
+    for set_number, itinerary_set in enumerate(st.session_state.all_generated_itineraries, 1):
+        st.write(f"## Itinerary Set {set_number}")
+        for itinerary_number, itinerary in enumerate(itinerary_set, 1):
+            with st.expander(f"Itinerary {itinerary_number}", expanded=True):
+                itinerary_message = ""
+                for day in itinerary:
+                    date = day['date']
+                    weather = day['weather']
+                    itinerary_message += f"**Date:** {date}\n\n"
+                    itinerary_message += f"**Weather forecast:** {weather}\n\n"
+                    for i, activity in enumerate(day['activities']):
+                        time = activity['time']
+                        activity_name = activity['activity']
+                        place_name = activity['place']['name']
+                        address = activity['place']['formatted_address']
+                        opening_hours = activity.get('opening_hours', 'N/A')
+                        
+                        itinerary_message += f"- {time}: {activity_name} at [{place_name}]({activity['place'].get('url', '#')})\n"
+                        itinerary_message += f"  - Address: {address}\n"
+                        itinerary_message += f"  - Opening Hours: {opening_hours}\n"
+                        if i < len(day['activities']) - 1:
+                            duration_value = activity.get('duration_to_next_value', float('inf'))
+                            duration_text = activity.get('duration_to_next', 'N/A')
+                            if duration_value <= 1800:  # 30 minutes or less
+                                color = 'green'
+                            elif duration_value <= 3600:  # 1 hour or less
+                                color = 'yellow'
+                            else:
+                                color = 'red'
+                            itinerary_message += f"  - :clock3: Travel time to next location ({mode_of_transport[:-8]}): <font color='{color}'>{duration_text}</font>\n"
                     
-                    itinerary_message += f"- {time}: {activity_name} at [{place_name}]({activity['place'].get('url', '#')})\n"
-                    itinerary_message += f"  - Address: {address}\n"
-                    itinerary_message += f"  - Opening Hours: {opening_hours}\n"
-                    if i < len(day['activities']) - 1:
-                        duration_value = activity.get('duration_to_next_value', float('inf'))
-                        duration_text = activity.get('duration_to_next', 'N/A')
-                        if duration_value <= 1800:  # 30 minutes or less
-                            color = 'green'
-                        elif duration_value <= 3600:  # 1 hour or less
-                            color = 'yellow'
-                        else:
-                            color = 'red'
-                        itinerary_message += f"  - :clock3: Travel time to next location ({mode_of_transport[:-8]}): <font color='{color}'>{duration_text}</font>\n"
-                    
-                    table_data.append([date, weather, time, activity_name, place_name, address, opening_hours])
+                    itinerary_message += "---\n\n"
                 
-                itinerary_message += "---\n\n"
-            
-            st.markdown(itinerary_message, unsafe_allow_html=True)
+                st.markdown(itinerary_message, unsafe_allow_html=True)
             
             col1, col2 = st.columns(2)
             with col1:
-                if st.button(f"Export Itinerary {itinerary_number} as PDF 📄", key=f"export_pdf_{itinerary_number}"):
-                    # Implement PDF export logic here
-                    st.success(f"Itinerary {itinerary_number} exported as PDF.")
-            with col2:
-                if st.button(f"Send Itinerary {itinerary_number} via Email 📧", key=f"send_email_{itinerary_number}"):
-                    # Implement email sending logic here
-                    st.success(f"Itinerary {itinerary_number} sent via email.")
+                    if st.button(f"Export Itinerary {itinerary_number} as PDF 📄", key=f"export_pdf_{set_number}_{itinerary_number}"):
+                        # Implement PDF export logic here
+                        st.success(f"Itinerary {itinerary_number} from Set {set_number} exported as PDF.")
+                with col2:
+                    if st.button(f"Send Itinerary {itinerary_number} via Email 📧", key=f"send_email_{set_number}_{itinerary_number}"):
+                        # Implement email sending logic here
+                        st.success(f"Itinerary {itinerary_number} from Set {set_number} sent via email.")
     
     # Create the DataFrame
     df = pd.DataFrame(table_data, columns=['Date', 'Weather', 'Time', 'Activity', 'Place', 'Address', 'Opening Hours'])
