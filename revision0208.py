@@ -91,7 +91,6 @@ def get_place_details(query, location, radius=5000, min_rating=2.5, min_reviews=
 
     return details
 
-@st.cache_data(ttl=7200)    
 def get_weather_forecast(city):
     url = f"https://api.weatherapi.com/v1/forecast.json?key={weather_api_key}&q={city}&days=14"
     response = requests.get(url)
