@@ -417,10 +417,10 @@ if st.session_state.all_generated_itineraries:
                     if st.button(f"Export Itinerary {itinerary_number} as PDF 📄", key=f"export_pdf_{set_number}_{itinerary_number}"):
                         # Implement PDF export logic here
                         st.success(f"Itinerary {itinerary_number} from Set {set_number} exported as PDF.")
-                with col2:
-                    if st.button(f"Send Itinerary {itinerary_number} via Email 📧", key=f"send_email_{set_number}_{itinerary_number}"):
-                        # Implement email sending logic here
-                        st.success(f"Itinerary {itinerary_number} from Set {set_number} sent via email.")
+            with col2:
+                if st.button(f"Send Itinerary {itinerary_number} via Email 📧", key=f"send_email_{set_number}_{itinerary_number}"):
+                    # Implement email sending logic here
+                    st.success(f"Itinerary {itinerary_number} from Set {set_number} sent via email.")
     
     # Create the DataFrame
     df = pd.DataFrame(table_data, columns=['Date', 'Weather', 'Time', 'Activity', 'Place', 'Address', 'Opening Hours'])
