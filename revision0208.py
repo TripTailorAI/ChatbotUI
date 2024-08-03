@@ -35,6 +35,7 @@ if 'generated_itineraries' not in st.session_state:
 # List of all countries
 countries = sorted([country.name for country in pycountry.countries])
 
+@st.cache_data(ttl=7200)
 def get_place_details(query, location, radius=5000, min_rating=2.5, min_reviews=5):
     url = "https://maps.googleapis.com/maps/api/place/textsearch/json"
     params = {
@@ -89,7 +90,8 @@ def get_place_details(query, location, radius=5000, min_rating=2.5, min_reviews=
             details[key] = default_place[key]
 
     return details
-    
+
+@st.cache_data(ttl=7200)    
 def get_weather_forecast(city):
     url = f"https://api.weatherapi.com/v1/forecast.json?key={weather_api_key}&q={city}&days=14"
     response = requests.get(url)
@@ -155,13 +157,15 @@ def get_daily_itinerary(destination, country, date, hotel_name, purpose_of_stay,
         print(f"Exception traceback: {traceback.format_exc()}")
         return None
 
+@st.cache_data(ttl=86400)
 def is_place_in_location(place, destination, country):
     address = place['formatted_address'].lower()
     return (destination.lower() in address or country.lower() in address or
             any(destination.lower() in component['long_name'].lower() or
                 country.lower() in component['long_name'].lower()
                 for component in place.get('address_components', [])))
-
+    
+@st.cache_data(ttl=86400) # Cache for 24 hours
 def get_place_opening_hours(place, date):
     if 'opening_hours' not in place or 'periods' not in place['opening_hours']:
         return "N/A"  # Opening hours not available
@@ -179,6 +183,12 @@ def get_place_opening_hours(place, date):
             return f"{open_time} - {close_time}"
 
     return "Closed"
+    
+@st.cache_data(ttl=86400)  # Cache for 24 hours
+def get_distance_matrix(origin, destination, mode):
+    url = f"https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin}&destinations={destination}&mode={mode}&key={google_places_api_key}"
+    response = requests.get(url)
+    return response.json()
 
 def create_travel_itinerary(destination, country, start_date, end_date, hotel_name, purpose_of_stay, mode_of_transport, custom_preferences):
     weather_forecast_data = get_weather_forecast(destination)
@@ -232,7 +242,8 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
                     destination = verified_itinerary[i + 1]['place']['formatted_address']
                     url = f"https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin}&destinations={destination}&mode={mode_of_transport}&key={google_places_api_key}"
                     response = requests.get(url)
-                    distance_data = response.json()
+                    distance_data = get_distance_matrix(origin, destination, mode_of_transport)
+
                 
                     if distance_data["status"] == "OK":
                         if (distance_data.get("rows") and
