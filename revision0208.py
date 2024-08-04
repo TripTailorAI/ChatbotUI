@@ -446,14 +446,16 @@ def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport
     
     return day_data
     
-    if st.sidebar.button("Export All Itineraries", key="export_all_itineraries"):
-        # Implement the export logic here
-        st.sidebar.success("All itineraries exported successfully!")
-
     # Add the generated itineraries to the message history
-   if st.session_state.all_generated_itineraries:
+    if st.session_state.all_generated_itineraries:
     total_itineraries = sum(len(itinerary_set) for itinerary_set in st.session_state.all_generated_itineraries)
     st.session_state.messages.append({
         "role": "assistant",
         "content": f"Generated {len(st.session_state.all_generated_itineraries)} set(s) of itineraries for {destination}, {country}. Total itineraries: {total_itineraries}."
     })
+
+    if st.sidebar.button("Export All Itineraries", key="export_all_itineraries"):
+        # Implement the export logic here
+        st.sidebar.success("All itineraries exported successfully!")
+
+   
