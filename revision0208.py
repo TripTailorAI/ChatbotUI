@@ -448,7 +448,8 @@ def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport
     
     # Add the generated itineraries to the message history
     if st.session_state.all_generated_itineraries:
-    total_itineraries = sum(len(itinerary_set) for itinerary_set in st.session_state.all_generated_itineraries)
+        total_itineraries = sum(len(itinerary_set) for itinerary_set in st.session_state.all_generated_itineraries)
+        
     st.session_state.messages.append({
         "role": "assistant",
         "content": f"Generated {len(st.session_state.all_generated_itineraries)} set(s) of itineraries for {destination}, {country}. Total itineraries: {total_itineraries}."
