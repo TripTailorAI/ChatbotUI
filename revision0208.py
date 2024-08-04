@@ -319,6 +319,52 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
 #     print(f"Exception traceback: {traceback.format_exc()}")
 
 #--------------------------------------------------------------------------------------------#
+def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport):
+    itinerary_message = ""
+    day_data = []
+    for day in itinerary:
+        date = day['date']
+        weather = day['weather']
+        itinerary_message += f"**Date:** {date}\n\n"
+        itinerary_message += f"**Weather forecast:** {weather}\n\n"
+        for i, activity in enumerate(day['activities']):
+            time = activity['time']
+            activity_name = activity['activity']
+            place_name = activity['place']['name']
+            address = activity['place']['formatted_address']
+            opening_hours = activity.get('opening_hours', 'N/A')
+            
+            itinerary_message += f"- {time}: {activity_name} at [{place_name}]({activity['place'].get('url', '#')})\n"
+            itinerary_message += f"  - Address: {address}\n"
+            itinerary_message += f"  - Opening Hours: {opening_hours}\n"
+            if i < len(day['activities']) - 1:
+                duration_value = activity.get('duration_to_next_value', float('inf'))
+                duration_text = activity.get('duration_to_next', 'N/A')
+                if duration_value <= 1800:  # 30 minutes or less
+                    color = 'green'
+                elif duration_value <= 3600:  # 1 hour or less
+                    color = 'yellow'
+                else:
+                    color = 'red'
+                itinerary_message += f"  - :clock3: Travel time to next location ({mode_of_transport[:-8]}): <font color='{color}'>{duration_text}</font>\n"
+            
+            day_data.append([date, weather, time, activity_name, place_name, address, opening_hours])
+        
+        itinerary_message += "---\n\n"
+    
+    st.markdown(itinerary_message, unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button(f"Export Itinerary {itinerary_number} as PDF 📄", key=f"export_pdf_{set_number}_{itinerary_number}"):
+            # Implement PDF export logic here
+            st.success(f"Itinerary {itinerary_number} from Set {set_number} exported as PDF.")
+    with col2:
+        if st.button(f"Send Itinerary {itinerary_number} via Email 📧", key=f"send_email_{set_number}_{itinerary_number}"):
+            # Implement email sending logic here
+            st.success(f"Itinerary {itinerary_number} from Set {set_number} sent via email.")
+    
+    return day_data
 # Streamlit app
 st.title("VoyagerAI🌎")
 # Short instructions
@@ -398,53 +444,6 @@ if st.session_state.all_generated_itineraries:
     
     #st.subheader("Itinerary Overview")
     #st.dataframe(df)
-    
-def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport):
-    itinerary_message = ""
-    day_data = []
-    for day in itinerary:
-        date = day['date']
-        weather = day['weather']
-        itinerary_message += f"**Date:** {date}\n\n"
-        itinerary_message += f"**Weather forecast:** {weather}\n\n"
-        for i, activity in enumerate(day['activities']):
-            time = activity['time']
-            activity_name = activity['activity']
-            place_name = activity['place']['name']
-            address = activity['place']['formatted_address']
-            opening_hours = activity.get('opening_hours', 'N/A')
-            
-            itinerary_message += f"- {time}: {activity_name} at [{place_name}]({activity['place'].get('url', '#')})\n"
-            itinerary_message += f"  - Address: {address}\n"
-            itinerary_message += f"  - Opening Hours: {opening_hours}\n"
-            if i < len(day['activities']) - 1:
-                duration_value = activity.get('duration_to_next_value', float('inf'))
-                duration_text = activity.get('duration_to_next', 'N/A')
-                if duration_value <= 1800:  # 30 minutes or less
-                    color = 'green'
-                elif duration_value <= 3600:  # 1 hour or less
-                    color = 'yellow'
-                else:
-                    color = 'red'
-                itinerary_message += f"  - :clock3: Travel time to next location ({mode_of_transport[:-8]}): <font color='{color}'>{duration_text}</font>\n"
-            
-            day_data.append([date, weather, time, activity_name, place_name, address, opening_hours])
-        
-        itinerary_message += "---\n\n"
-    
-    st.markdown(itinerary_message, unsafe_allow_html=True)
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button(f"Export Itinerary {itinerary_number} as PDF 📄", key=f"export_pdf_{set_number}_{itinerary_number}"):
-            # Implement PDF export logic here
-            st.success(f"Itinerary {itinerary_number} from Set {set_number} exported as PDF.")
-    with col2:
-        if st.button(f"Send Itinerary {itinerary_number} via Email 📧", key=f"send_email_{set_number}_{itinerary_number}"):
-            # Implement email sending logic here
-            st.success(f"Itinerary {itinerary_number} from Set {set_number} sent via email.")
-    
-    return day_data
     
     # Add the generated itineraries to the message history
     if st.session_state.all_generated_itineraries:
