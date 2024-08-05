@@ -521,9 +521,9 @@ def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport
             # Implement PDF export logic here
             st.success(f"Itinerary {itinerary_number} from Set {set_number} exported as PDF.")
     with col2:
-    if st.button(f"Send Itinerary {itinerary_number} via Email 📧", key=f"send_email_{set_number}_{itinerary_number}"):
-        send_to_gsheets(itinerary, set_number, itinerary_number, email_address, destination, start_date, end_date)
-        st.success(f"Itinerary {itinerary_number} from Set {set_number} sent via email.")
+        if st.button(f"Send Itinerary {itinerary_number} via Email 📧", key=f"send_email_{set_number}_{itinerary_number}"):
+            send_to_gsheets(itinerary, set_number, itinerary_number, email_address, destination, start_date, end_date)
+            st.success(f"Itinerary {itinerary_number} from Set {set_number} sent via email.")
     
     return day_data
 
