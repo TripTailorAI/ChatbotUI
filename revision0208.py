@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 import traceback
 import time
 import pycountry
+import pygsheets
 
 #COLAB
 # from google.colab import userdata
@@ -130,19 +131,77 @@ def get_daily_itinerary(destination, country, date, hotel_name, purpose_of_stay,
     2. Start the itinerary with the first activity outside the hotel.
     3. Do not repeat any place names within the same itinerary. Each day should have unique activities.
     4. The following places have already been used in previous days and should not be suggested again: {used_places_str}
-    5. Ensure all suggested places are within {destination}. Do not suggest places in other cities.
+    5. Ensure all suggested places are within {destination}. Do not suggest places in other cities or more than 2 hours away from the city.
     6. Consider the mode of transportation when suggesting places. If the mode is walking, keep destinations closer together.
     7. Take into account the custom preferences provided by the user.
+    8. End the itinerary with going back to the place the person is staying at.
+    9. The person will always be staying at the hotel that is within the same city of destination. If you cannot find a hotel by that name in the same city, assume that the person is staying somewhere within the city centre main station.
 
     Format the output as a JSON object with each entry containing:
-    - time: suggested time for the activity (e.g., "09:00")
+    - time: suggested time for the activity on date: {date} in the local timezone of the place (for example 09:00)
     - activity: short description of the activity
     - place: specific name of the place to visit
+    - time_int: suggested time for the activity on date: {date} in the local timezone of the place (for example 09:00) but as an integer in seconds since midnight, January 1, 1970 UTC
+    - approx_distance : approximate distance in kms from the main train station
 
     Example format:
     {{
-        "1": {{"time": "09:30", "activity": "Morning walk", "place": "Specific Park Name"}},
-        "2": {{"time": "11:00", "activity": "Visit museum", "place": "Specific Museum Name"}},
+        "1": {{"time": "09:30", "activity": "Morning walk", "place": "Specific Park Name","time_int":"1722562818","approx_distance":"2.6 kms"}},
+        "2": {{"time": "11:00", "activity": "Visit museum", "place": "Specific Museum Name","time_int":"1722572818","approx_distance":"2.6 kms"}},
+        ...
+    }}
+    """
+    model = genai.GenerativeModel('gemini-1.5-flash')
+    response = model.generate_content(user_message)
+
+    try:
+        response_text = response.text
+        json_start = response_text.find('{')
+        json_end = response_text.rfind('}') + 1
+        json_str = response_text[json_start:json_end]
+        return json.loads(json_str)
+    except Exception as e:
+        print(f"Error processing Gemini response: {e}")
+        print(f"Response: {response}")
+        print(f"Exception type: {type(e)}")
+        print(f"Exception traceback: {traceback.format_exc()}")
+        return None
+        
+def get_nightlife_itinerary(destination, country, date, hotel_name, purpose_of_stay, weather_forecast, day_number, trip_length, used_places, mode_of_transport, custom_preferences):
+    used_places_str = ", ".join(used_places)
+    user_message = f"""
+    Create a daily nightlife itinerary starting for day {day_number} of a {trip_length}-day trip to {destination}, {country}.
+    It should start from 22:00 on {date} and end at 04:00 the next day
+    Date: {date}
+    Staying at: {hotel_name}
+    Purpose of stay: {purpose_of_stay}
+    Weather forecast: {weather_forecast}
+    Mode of transportation: {mode_of_transport}
+    Custom preferences: {custom_preferences}
+
+    Please provide the nightlife itinerary with suggested times for each place. Be specific with place names and try to suggest special events if any.
+
+    Important guidelines:
+    1. Do not repeat any place names within the same itinerary. Each day should have unique places.
+    2. Include atleast 1 local pub or bar
+    3. Check if events exist at Resident Advisor Guide in the city.
+    5. Ensure all suggested places are within {destination}. Do not suggest places in other cities or more than 2 hours away from the city.
+    6. Ignore the mode of transportation when suggesting places.
+    7. Take into account the custom preferences provided by the user.
+    8. End the itinerary with going back to the place the person is staying at around 03:30 in the morning next day.
+    9. The person will always be staying at the hotel that is within the same city of destination. If you cannot find a hotel by that name in the same city, assume that the person is staying somewhere within the city centre main station.
+
+    Format the output as a JSON object with each entry containing:
+    - time: suggested time for the activity on date: {date} in the local timezone of the place (for example 09:00)
+    - activity: short description of the activity
+    - place: specific name of the place to visit
+    - time_int: suggested time for the activity on date: {date} in the local timezone of the place (for example 09:00) but as an integer in seconds since midnight, January 1, 1970 UTC
+    - approx_distance : approximate distance in kms from the main train station
+
+    Example format:
+    {{
+        "1": {{"time": "09:30", "activity": "Morning walk", "place": "Specific Park Name","time_int":"1722562818","approx_distance":"2.6 kms"}},
+        "2": {{"time": "11:00", "activity": "Visit museum", "place": "Specific Museum Name","time_int":"1722572818","approx_distance":"2.6 kms"}},
         ...
     }}
     """
@@ -163,7 +222,6 @@ def get_daily_itinerary(destination, country, date, hotel_name, purpose_of_stay,
         print(f"Exception type: {type(e)}")
         print(f"Exception traceback: {traceback.format_exc()}")
         return None
-
 @st.cache_data(ttl=86400)
 def is_place_in_location(place, destination, country):
     address = place['formatted_address'].lower()
@@ -214,14 +272,14 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
             daily_itinerary = get_daily_itinerary(destination, country, current_date, hotel_name, purpose_of_stay, weather_summary, day + 1, num_days, all_used_places, mode_of_transport, custom_preferences)
 
             if daily_itinerary is None:
-                print(f"Error: Failed to get itinerary from GeminiAI for {current_date}")
+                # print(f"Error: Failed to get itinerary from GeminiAI for {current_date}")
                 print(f"Skipping this day in the itinerary.")
                 continue
 
             verified_itinerary = []
             for item in daily_itinerary.values():
                 if item['place'] in all_used_places:
-                    print(f"Skipping repeated place: {item['place']}")
+                    # print(f"Skipping repeated place: {item['place']}")
                     continue
 
                 place_details = get_place_details(f"{item['place']} in {destination}, {country}", f"{destination}, {country}")
@@ -231,25 +289,32 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
                     'time': item['time'],
                     'activity': item['activity'],
                     'place': selected_place,
-                    'opening_hours': opening_hours
+                    'opening_hours': opening_hours,
+                    'time_int': item['time_int'],
+                    'approx_distance': item['approx_distance']
                 })
                 all_used_places.add(item['place'])  # Add to all used places
                 used_places.add(item['place'])
-                
+
             # Only process travel times if there are activities
             if verified_itinerary:
                 for i in range(len(verified_itinerary) - 1):
                     origin = verified_itinerary[i]['place']['formatted_address']
                     destination = verified_itinerary[i + 1]['place']['formatted_address']
-                    url = f"https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin}&destinations={destination}&mode={mode_of_transport}&key={google_places_api_key}"
+                    dep_time = verified_itinerary[i + 1]['time_int']
+                    act_time = verified_itinerary[i + 1]['time']
+                    date_time = current_date+' '+act_time+':00'
+                    pattern = '%Y-%m-%d %H:%M:%S'
+                    epoch = int(time.mktime(time.strptime(date_time, pattern)))
+                    url = f"https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin}&destinations={destination}&mode={mode_of_transport}&key={google_places_api_key}&departure_time={epoch}"
                     response = requests.get(url)
                     distance_data = response.json()
-                
+
                     if distance_data["status"] == "OK":
                         if (distance_data.get("rows") and
                             distance_data["rows"][0].get("elements") and
                             distance_data["rows"][0]["elements"][0].get("status") == "OK"):
-                
+
                             element = distance_data["rows"][0]["elements"][0]
                             if "duration" in element:
                                 duration = element["duration"]["text"]
@@ -269,15 +334,111 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
                 # Set the last activity's duration to "N/A" only if there are activities
                 verified_itinerary[-1]['duration_to_next'] = "N/A"
                 verified_itinerary[-1]['duration_to_next_value'] = 0
-                    
+
             itinerary.append({
                 'date': current_date,
                 'weather': weather_summary,
                 'activities': verified_itinerary
             })
-        
+
         all_itineraries.append(itinerary)
-                    
+    print(all_itineraries)
+    return all_itineraries
+
+def create_night_itinerary(destination, country, start_date, end_date, hotel_name, purpose_of_stay, mode_of_transport, custom_preferences):
+    weather_forecast_data = get_weather_forecast(destination)
+    num_days = (pd.to_datetime(end_date) - pd.to_datetime(start_date)).days + 1
+    all_itineraries = []
+    start_date_dt = pd.to_datetime(start_date)
+    all_used_places = set()  # Track used places across all itineraries
+
+    for itinerary_version in range(3):
+        itinerary = []
+        used_places = set()  # Track used places for this itinerary
+
+        for day in range(num_days):
+            current_date = (start_date_dt + pd.Timedelta(days=day)).strftime('%Y-%m-%d')
+
+            weather_summary = next((day['day'] for day in weather_forecast_data['forecast']['forecastday'] if day['date'] == current_date), None)
+            if weather_summary:
+                weather_summary = f"{weather_summary['condition']['text']}: {weather_summary['maxtemp_c']}°C (max), {weather_summary['mintemp_c']}°C (min)"
+            else:
+                weather_summary = "Weather data not available"
+
+            daily_itinerary = get_nightlife_itinerary(destination, country, current_date, hotel_name, purpose_of_stay, weather_summary, day + 1, num_days, all_used_places, mode_of_transport, custom_preferences)
+
+            if daily_itinerary is None:
+                print(f"Error: Failed to get itinerary from GeminiAI for {current_date}")
+                # print(f"Skipping this day in the itinerary.")
+                continue
+
+            verified_itinerary = []
+            for item in daily_itinerary.values():
+                if item['place'] in all_used_places:
+                    # print(f"Skipping repeated place: {item['place']}")
+                    continue
+
+                place_details = get_place_details(f"{item['place']} in {destination}, {country}", f"{destination}, {country}")
+                selected_place = place_details
+                opening_hours = get_place_opening_hours(selected_place, current_date)
+                verified_itinerary.append({
+                    'time': item['time'],
+                    'activity': item['activity'],
+                    'place': selected_place,
+                    'opening_hours': opening_hours,
+                    'time_int': item['time_int'],
+                    'approx_distance': item['approx_distance']
+                })
+                all_used_places.add(item['place'])  # Add to all used places
+                used_places.add(item['place'])
+
+            # Only process travel times if there are activities
+            if verified_itinerary:
+                for i in range(len(verified_itinerary) - 1):
+                    origin = verified_itinerary[i]['place']['formatted_address']
+                    destination = verified_itinerary[i + 1]['place']['formatted_address']
+                    dep_time = verified_itinerary[i + 1]['time_int']
+                    act_time = verified_itinerary[i + 1]['time']
+                    date_time = current_date+' '+act_time+':00'
+                    pattern = '%Y-%m-%d %H:%M:%S'
+                    epoch = int(time.mktime(time.strptime(date_time, pattern)))
+                    url = f"https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin}&destinations={destination}&mode={mode_of_transport}&key={google_places_api_key}&departure_time={epoch}"
+                    response = requests.get(url)
+                    distance_data = response.json()
+
+                    if distance_data["status"] == "OK":
+                        if (distance_data.get("rows") and
+                            distance_data["rows"][0].get("elements") and
+                            distance_data["rows"][0]["elements"][0].get("status") == "OK"):
+
+                            element = distance_data["rows"][0]["elements"][0]
+                            if "duration" in element:
+                                duration = element["duration"]["text"]
+                                duration_value = element["duration"]["value"]
+                                verified_itinerary[i]['duration_to_next'] = duration
+                                verified_itinerary[i]['duration_to_next_value'] = duration_value
+                            else:
+                                verified_itinerary[i]['duration_to_next'] = "Unable to calculate duration"
+                                verified_itinerary[i]['duration_to_next_value'] = float('inf')
+                        else:
+                            verified_itinerary[i]['duration_to_next'] = "Route not found"
+                            verified_itinerary[i]['duration_to_next_value'] = float('inf')
+                    else:
+                        verified_itinerary[i]['duration_to_next'] = f"API Error: {distance_data['status']}"
+                        verified_itinerary[i]['duration_to_next_value'] = float('inf')
+
+                # Set the last activity's duration to "N/A" only if there are activities
+                verified_itinerary[-1]['duration_to_next'] = "N/A"
+                verified_itinerary[-1]['duration_to_next_value'] = 0
+
+            itinerary.append({
+                'date': current_date,
+                'weather': weather_summary,
+                'activities': verified_itinerary
+            })
+
+        all_itineraries.append(itinerary)
+    print(all_itineraries)
     return all_itineraries
 
 # #COLAB
@@ -365,6 +526,21 @@ def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport
             st.success(f"Itinerary {itinerary_number} from Set {set_number} sent via email.")
     
     return day_data
+
+def generate_df(itineraries):
+  itinerary_data =[]
+  columns = ['itinerary_version','date','weather','time','activity','place','MapsLink','Address','Hours']
+  for i, itinerary in enumerate(itineraries, 1):
+    for day in itinerary:
+        for j, activity in enumerate(day['activities'], 1):
+          itinerary_data.append([i,day['date'],day['weather']
+                                  ,activity['time'],activity['activity']
+                                  ,activity['place']['name'],activity['place']['url'],activity['place']['formatted_address']
+                                  ,activity['opening_hours']])
+  df = pd.DataFrame(itinerary_data)
+  df.columns = columns
+  return df
+
 # Streamlit app
 st.title("VoyagerAI🌎")
 # Short instructions
@@ -440,11 +616,27 @@ if st.session_state.all_generated_itineraries:
                     table_data.extend(display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport))
 
     # Create the DataFrame
-    df = pd.DataFrame(table_data, columns=['Date', 'Weather', 'Time', 'Activity', 'Place', 'Address', 'Opening Hours'])
+    dfi = pd.DataFrame(table_data, columns=['Date', 'Weather', 'Time', 'Activity', 'Place', 'Address', 'Opening Hours'])
     
     #st.subheader("Itinerary Overview")
-    #st.dataframe(df)
+    #st.dataframe(dfi)
     
+    #Google Sheets Imports 
+    gc = pygsheets.authorize(service_file=r"D:\sheets-drive-api-1-6cd89c19205a.json")
+    sheet_id = '1Mw_kkGf8Z5qN2RGhOzIM04zEN30cZIznrOfjWPwNluc'
+    worksheet_name = 'Base_Day'
+    sh = gc.open_by_key(sheet_id)
+    wks = sh.worksheet_by_title(worksheet_name)  # Select the first sheet
+    start_cell = 'C2'
+    end_cell = 'K500'
+    wks.clear(start=start_cell, end=end_cell)
+    wks.set_dataframe(df_night, (1, 3))
+    worksheet_name = 'Master'
+    wks = sh.worksheet_by_title(worksheet_name)  # Select the first sheet
+    wks.update_value("B1",email_address)
+    wks.update_value("B2",destination)
+    wks.update_value("B3",start_date)
+    wks.update_value("B4",end_date)
     # Add the generated itineraries to the message history
     if st.session_state.all_generated_itineraries:
         total_itineraries = sum(len(itinerary_set) for itinerary_set in st.session_state.all_generated_itineraries)
