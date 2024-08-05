@@ -522,7 +522,7 @@ def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport
             st.success(f"Itinerary {itinerary_number} from Set {set_number} exported as PDF.")
     with col2:
         if st.button(f"Send Itinerary {itinerary_number} via Email 📧", key=f"send_email_{set_number}_{itinerary_number}"):
-            send_to_gsheets
+            send_to_gsheets()
             st.success(f"Itinerary {itinerary_number} from Set {set_number} sent via email.")
     
     return day_data
@@ -622,7 +622,7 @@ if st.session_state.all_generated_itineraries:
     #st.dataframe(dfi)
     
     #Google Sheets Imports 
-def send_to_gsheets:
+def send_to_gsheets():
     df = generate_df(itineraries)
     gc = pygsheets.authorize(service_file=r"voyager-git/ChatbotUI/sheets-drive-api-1-6cd89c19205a.json")
     sheet_id = '1Mw_kkGf8Z5qN2RGhOzIM04zEN30cZIznrOfjWPwNluc'
