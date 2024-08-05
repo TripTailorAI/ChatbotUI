@@ -528,18 +528,18 @@ def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport
     return day_data
 
 def generate_df(itineraries):
-  itinerary_data =[]
-  columns = ['itinerary_version','date','weather','time','activity','place','MapsLink','Address','Hours']
-  for i, itinerary in enumerate(itineraries, 1):
-    for day in itinerary:
-        for j, activity in enumerate(day['activities'], 1):
-          itinerary_data.append([i,day['date'],day['weather']
-                                  ,activity['time'],activity['activity']
-                                  ,activity['place']['name'],activity['place']['url'],activity['place']['formatted_address']
-                                  ,activity['opening_hours']])
-  df = pd.DataFrame(itinerary_data)
-  df.columns = columns
-  return df
+    itinerary_data =[]
+    columns = ['itinerary_version','date','weather','time','activity','place','MapsLink','Address','Hours']
+    for i, itinerary in enumerate(itineraries, 1):
+        for day in itinerary:
+            for j, activity in enumerate(day['activities'], 1):
+            itinerary_data.append([i,day['date'],day['weather']
+                                    ,activity['time'],activity['activity']
+                                    ,activity['place']['name'],activity['place']['url'],activity['place']['formatted_address']
+                                    ,activity['opening_hours']])
+    df = pd.DataFrame(itinerary_data)
+    df.columns = columns
+    return df
 
 def send_to_gsheets(itineraries):
     df = generate_df(itineraries)
