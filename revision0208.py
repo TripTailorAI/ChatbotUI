@@ -541,6 +541,24 @@ def generate_df(itineraries):
   df.columns = columns
   return df
 
+def send_to_gsheets(itineraries):
+    df = generate_df(itineraries)
+    gc = pygsheets.authorize(service_file=r"voyager-git/ChatbotUI/sheets-drive-api-1-6cd89c19205a.json")
+    sheet_id = '1Mw_kkGf8Z5qN2RGhOzIM04zEN30cZIznrOfjWPwNluc'
+    worksheet_name = 'Base_Day'
+    sh = gc.open_by_key(sheet_id)
+    wks = sh.worksheet_by_title(worksheet_name)  # Select the first sheet
+    start_cell = 'C2'
+    end_cell = 'K500'
+    wks.clear(start=start_cell, end=end_cell)
+    wks.set_dataframe(df, (1, 3))
+    worksheet_name = 'Master'
+    wks = sh.worksheet_by_title(worksheet_name)  # Select the first sheet
+    wks.update_value("B1",email_address)
+    wks.update_value("B2",destination)
+    wks.update_value("B3",start_date)
+    wks.update_value("B4",end_date)
+    
 # Streamlit app
 st.title("VoyagerAI🌎")
 # Short instructions
@@ -634,23 +652,18 @@ if st.session_state.all_generated_itineraries:
         st.sidebar.success("All itineraries exported successfully!")
 
     #Google Sheets Imports 
-def send_to_gsheets(itineraries):
-    df = generate_df(itineraries)
-    gc = pygsheets.authorize(service_file=r"voyager-git/ChatbotUI/sheets-drive-api-1-6cd89c19205a.json")
-    sheet_id = '1Mw_kkGf8Z5qN2RGhOzIM04zEN30cZIznrOfjWPwNluc'
-    worksheet_name = 'Base_Day'
-    sh = gc.open_by_key(sheet_id)
-    wks = sh.worksheet_by_title(worksheet_name)  # Select the first sheet
-    start_cell = 'C2'
-    end_cell = 'K500'
-    wks.clear(start=start_cell, end=end_cell)
-    wks.set_dataframe(df, (1, 3))
-    worksheet_name = 'Master'
-    wks = sh.worksheet_by_title(worksheet_name)  # Select the first sheet
-    wks.update_value("B1",email_address)
-    wks.update_value("B2",destination)
-    wks.update_value("B3",start_date)
-    wks.update_value("B4",end_date)
 
+<<<<<<< HEAD
+
+    # Add the generated itineraries to the message history
+    if st.session_state.all_generated_itineraries:
+        total_itineraries = sum(len(itinerary_set) for itinerary_set in st.session_state.all_generated_itineraries)
+        
+    st.session_state.messages.append({
+        "role": "assistant",
+        "content": f"Generated {len(st.session_state.all_generated_itineraries)} set(s) of itineraries for {destination}, {country}. Total itineraries: {total_itineraries}."
+    })
+=======
+>>>>>>> 8c0876bb658e9338d59f7198dec7e7c2675817f9
 
    
