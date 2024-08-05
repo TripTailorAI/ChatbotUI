@@ -551,7 +551,7 @@ def send_to_gsheets():
         credentials = connect(**st.secrets.gcp_service_account)
         
         # Remove json.loads() here
-        gc = pygsheets.authorize(service_account_info=credentials)
+        gc = pygsheets.authorize(credentials)
         
         # Rest of your function remains the same
         sheet_id = '1Mw_kkGf8Z5qN2RGhOzIM04zEN30cZIznrOfjWPwNluc'
