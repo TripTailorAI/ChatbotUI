@@ -542,7 +542,7 @@ def generate_df(all_itineraries):
     return df
 
 def send_to_gsheets():
-    df = generate_df(itineraries)
+    df = generate_df(all_itineraries)
     gc = pygsheets.authorize(service_file=r"voyager-git/ChatbotUI/sheets-drive-api-1-6cd89c19205a.json")
     sheet_id = '1Mw_kkGf8Z5qN2RGhOzIM04zEN30cZIznrOfjWPwNluc'
     worksheet_name = 'Base_Day'
