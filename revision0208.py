@@ -658,7 +658,7 @@ if st.session_state.all_generated_itineraries:
 
     # Display all previously generated itinerary sets in reverse order
     if st.session_state.all_generated_itineraries:
-    st.subheader("VoyagerAI's Response")
+        st.subheader("VoyagerAI's Response")
     
     # Display the most recently generated itinerary set
     most_recent_set = st.session_state.all_generated_itineraries[-1]
