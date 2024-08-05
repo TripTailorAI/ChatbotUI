@@ -9,7 +9,8 @@ import traceback
 import time
 import pycountry
 import pygsheets
-
+import json
+from google.oauth2.service_account import Credentials
 #COLAB
 # from google.colab import userdata
 # import logging
@@ -545,7 +546,12 @@ def send_to_gsheets():
     if st.session_state.all_generated_itineraries:
         most_recent_set = st.session_state.all_generated_itineraries[-1]
         df = generate_df(most_recent_set)
-        gc = pygsheets.authorize(service_file=r"voyager-git/ChatbotUI/sheets-drive-api-1-6cd89c19205a.json")
+        
+        # Use the service account info from secrets
+        service_account_info = json.loads(json.dumps(st.secrets["gcp_service_account"]))
+        credentials = Credentials.from_service_account_info(service_account_info)
+        
+        gc = pygsheets.authorize(custom_credentials=credentials)
         sheet_id = '1Mw_kkGf8Z5qN2RGhOzIM04zEN30cZIznrOfjWPwNluc'
         worksheet_name = 'Base_Day'
         sh = gc.open_by_key(sheet_id)
