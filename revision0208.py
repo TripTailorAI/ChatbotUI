@@ -522,7 +522,7 @@ def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport
             st.success(f"Itinerary {itinerary_number} from Set {set_number} exported as PDF.")
     with col2:
         if st.button(f"Send Itinerary {itinerary_number} via Email 📧", key=f"send_email_{set_number}_{itinerary_number}"):
-            send_to_gsheets(itinerary, set_number, itinerary_number, email_address, destination, start_date, end_date)
+            send_to_gsheets()
             st.success(f"Itinerary {itinerary_number} from Set {set_number} sent via email.")
     
     return day_data
@@ -622,29 +622,24 @@ if st.session_state.all_generated_itineraries:
     #st.dataframe(dfi)
     
     #Google Sheets Imports 
-def send_to_gsheets(itinerary, set_number, itinerary_number, email_address, destination, start_date, end_date):
-    df = generate_df([itinerary])  # Generate DataFrame for a single itinerary
+def send_to_gsheets():
+    df = generate_df(itineraries)
     gc = pygsheets.authorize(service_file=r"voyager-git/ChatbotUI/sheets-drive-api-1-6cd89c19205a.json")
     sheet_id = '1Mw_kkGf8Z5qN2RGhOzIM04zEN30cZIznrOfjWPwNluc'
-    
-    # Update Base_Day worksheet
     worksheet_name = 'Base_Day'
     sh = gc.open_by_key(sheet_id)
-    wks = sh.worksheet_by_title(worksheet_name)
+    wks = sh.worksheet_by_title(worksheet_name)  # Select the first sheet
     start_cell = 'C2'
     end_cell = 'K500'
     wks.clear(start=start_cell, end=end_cell)
     wks.set_dataframe(df, (1, 3))
-    
-    # Update Master worksheet
     worksheet_name = 'Master'
-    wks = sh.worksheet_by_title(worksheet_name)
-    wks.update_value("B1", email_address)
-    wks.update_value("B2", destination)
-    wks.update_value("B3", start_date)
-    wks.update_value("B4", end_date)
-    wks.update_value("B5", f"Set {set_number}, Itinerary {itinerary_number}")
-    
+    wks = sh.worksheet_by_title(worksheet_name)  # Select the first sheet
+    wks.update_value("B1",email_address)
+    wks.update_value("B2",destination)
+    wks.update_value("B3",start_date)
+    wks.update_value("B4",end_date)
+
     # Add the generated itineraries to the message history
     if st.session_state.all_generated_itineraries:
         total_itineraries = sum(len(itinerary_set) for itinerary_set in st.session_state.all_generated_itineraries)
