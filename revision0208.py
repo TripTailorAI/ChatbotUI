@@ -541,7 +541,7 @@ def generate_df(itineraries):
     df.columns = columns
     return df
 
-def send_to_gsheets(itineraries):
+def send_to_gsheets():
     df = generate_df(itineraries)
     gc = pygsheets.authorize(service_file=r"voyager-git/ChatbotUI/sheets-drive-api-1-6cd89c19205a.json")
     sheet_id = '1Mw_kkGf8Z5qN2RGhOzIM04zEN30cZIznrOfjWPwNluc'
@@ -648,7 +648,7 @@ if st.session_state.all_generated_itineraries:
     })
 
     if st.sidebar.button("Export All Itineraries", key="export_all_itineraries"):
-        send_to_gsheets(itineraries)
+        send_to_gsheets()
         st.sidebar.success("All itineraries exported successfully!")
 
     #Google Sheets Imports 
