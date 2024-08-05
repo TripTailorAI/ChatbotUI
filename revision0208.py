@@ -542,22 +542,27 @@ def generate_df(all_itineraries):
     return df
 
 def send_to_gsheets():
-    df = generate_df(all_itineraries)
-    gc = pygsheets.authorize(service_file=r"voyager-git/ChatbotUI/sheets-drive-api-1-6cd89c19205a.json")
-    sheet_id = '1Mw_kkGf8Z5qN2RGhOzIM04zEN30cZIznrOfjWPwNluc'
-    worksheet_name = 'Base_Day'
-    sh = gc.open_by_key(sheet_id)
-    wks = sh.worksheet_by_title(worksheet_name)  # Select the first sheet
-    start_cell = 'C2'
-    end_cell = 'K500'
-    wks.clear(start=start_cell, end=end_cell)
-    wks.set_dataframe(df, (1, 3))
-    worksheet_name = 'Master'
-    wks = sh.worksheet_by_title(worksheet_name)  # Select the first sheet
-    wks.update_value("B1",email_address)
-    wks.update_value("B2",destination)
-    wks.update_value("B3",start_date)
-    wks.update_value("B4",end_date)
+    if st.session_state.all_generated_itineraries:
+        most_recent_set = st.session_state.all_generated_itineraries[-1]
+        df = generate_df(most_recent_set)
+        gc = pygsheets.authorize(service_file=r"voyager-git/ChatbotUI/sheets-drive-api-1-6cd89c19205a.json")
+        sheet_id = '1Mw_kkGf8Z5qN2RGhOzIM04zEN30cZIznrOfjWPwNluc'
+        worksheet_name = 'Base_Day'
+        sh = gc.open_by_key(sheet_id)
+        wks = sh.worksheet_by_title(worksheet_name)  # Select the first sheet
+        start_cell = 'C2'
+        end_cell = 'K500'
+        wks.clear(start=start_cell, end=end_cell)
+        wks.set_dataframe(df, (1, 3))
+        worksheet_name = 'Master'
+        wks = sh.worksheet_by_title(worksheet_name)  # Select the first sheet
+        wks.update_value("B1", email_address)
+        wks.update_value("B2", destination)
+        wks.update_value("B3", start_date)
+        wks.update_value("B4", end_date)
+        return True
+    else:
+        return False
     
 # Streamlit app
 st.title("VoyagerAI🌎")
@@ -648,8 +653,10 @@ if st.session_state.all_generated_itineraries:
     })
 
     if st.sidebar.button("Export All Itineraries", key="export_all_itineraries"):
-        send_to_gsheets()
-        st.sidebar.success("All itineraries exported successfully!")
+        if send_to_gsheets():
+            st.sidebar.success("Most recent itinerary set exported successfully!")
+        else:
+        st.sidebar.error("No itineraries to export. Please generate an itinerary first.")
 
     #Google Sheets Imports 
 
