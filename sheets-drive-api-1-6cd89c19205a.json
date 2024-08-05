@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "sheets-drive-api-1",
+  "private_key_id": "6cd89c19205a1e976b8ebc9f9430051ecfef92bf",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCqcIrtpFU+n4Qu\nFOdmPKNL7ZJad7dLryNr88VToXzGW2rhn6r+Pao2E8GKDpateOQH19uEEH/g0QOS\nooZdfC6YVcTQHhDKlpU9vXRM5H1Cym6oChahyvHToGhK3hmujN1P0I9m8P4BlOPt\nywJRNuEioyiVYSs+bR6uP19dDpeNVisJnyvYqMIzJqaCTJZvG0H2XgcOHnjE93wE\nFsk1H383r17c6elScNNGIrDb0IUVWHPx2g337N4zFRccq47UWxtHXfWtYnf+GBvg\nfSyG8FGipiSYPUSsJ2cY9iexRqzBb6YqCwx7zMtQOLINpeONZ4teBtNatbvIrA2d\nP3BA/xEdAgMBAAECggEADOys2rl2WpUKsNqv83F2UDJedN+U9dD801mKC9eRy5IW\n6ElNB6uFOUWSDK+8UfPglg55D6oxCeTMeKjV0WGZDPJprGVJqhTCK3Gu6VfLfq5o\nHSdqsO+S5/sT4/C0q0DBiL7MtdmUTjb/eikSiDZGDnQN7OOQVzlu6ERXYHCg7tXL\nO2TTEaNeoJ4iKbCvemoeixhOR4FEM7Pv4TOTFX9ihoRp1AUyoMV9fI6tcG3WeipN\nWMkTERyPhea/7R8eoH5c2tKxo8tLn9+01M6X9SLFHxzd4Wjlgf7DVHBasytkD2Du\nc1/6C7sk7+sX1HF+hVqTq7LOIa6b+JAufJN7CQc+ZwKBgQDxBrVM+v8Le0ROftNx\n8SFPCTki9J7xhOTRnMm7ZnEUivlaUMe+Byz6SZSpyczBLltjMGbrd5RZNUJb1tNq\n6ALXU5LtpiA8/nZbjpwdZxiksx2V4SfiTrwQMQtS3ie9o9VFbN0cZLVk3JItyy4j\niu0AiVERjfy5bq7TPV9Z72F5LwKBgQC1BzjjEjlWKh/sJVhZ/hztiEPrCak02l7V\nGZeTzAz3UXXaFDuAFFeBvjtpn4PAhd+sB4fsIYf0jFaPXtiPawob0zgtYBL82cjF\nfbBfIa4Xin4wPOh9kFM7AcBg0BucKCiHgwlH3dS8G60qFKA4Rx5mt4zZhDzh+5Hf\nxZ5jUuovcwKBgQCKqwpZ3Lopl+THqG3sSweX2j2WH9jmKUggVK03dQuv/vjQ/lK8\nwJIe+YBfYuu7ZPlNCsbbx/OAk4S3I9SE2DDyQ3Hv6jj3/oqHyHeG7w6dizOFTIHO\n0O+f/Sd/qLKCh6SnCaf4svQtsD0lvZSw/De4rEgI6oCxCr3oaJHYQ0H4HwKBgD+I\ntl1zcu4bwLJndPe4qLxw+61M6bbkAS53WeyES/StAVi1iyBrgz7E3iM22c3C7np4\n9ipYplecvXB6EDVdkuGrIudB9cgKQ12UvEbXEjuu3pTde5c+BQgLmFIiF96ZdYgB\n5Er1vwj6Ca9gJ884nqHcP7HDqH6DhXHs8KbZXdmjAoGBANgJBOCQfx7W4yzAejQc\nruzI/iFBTsOKEHCzoOnnuyTYCAYCljgGDg2Kc3pF6h1hWvDExqLJViPNd6+ltYbM\nw7ul4JIAm2/Zp4EmttVI/OhahoUz++p8gsMi9dx2ZWT03QAAYZJQrMZkgL8C+jN3\nZ/5FIotzjYU+lDNukwe+Oc0R\n-----END PRIVATE KEY-----\n",
+  "client_email": "sheets-drive-service-account@sheets-drive-api-1.iam.gserviceaccount.com",
+  "client_id": "103233035943618722331",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/sheets-drive-service-account%40sheets-drive-api-1.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
