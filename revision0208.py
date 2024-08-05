@@ -608,8 +608,6 @@ transport_modes = {
 }
 mode_of_transport = st.sidebar.selectbox("🚀 Mode of Transportation", list(transport_modes.keys()))
 mode_of_transport_value = transport_modes[mode_of_transport]
-generate_nightlife = st.sidebar.checkbox("🌙 Generate Nightlife Itinerary", value=False)
-
 
 # Custom preferences input
 custom_preferences = st.sidebar.text_area("✨ Custom Preferences", 
@@ -618,21 +616,12 @@ custom_preferences = st.sidebar.text_area("✨ Custom Preferences",
 if st.sidebar.button("Generate Itinerary"):
     with st.spinner("Generating itinerary, please wait..."):
         try:
-            new_day_itineraries = create_travel_itinerary(
+            new_itineraries = create_travel_itinerary(
                 destination, country, start_date.strftime("%Y-%m-%d"), 
                 end_date.strftime("%Y-%m-%d"), hotel_name, purpose_of_stay, 
                 mode_of_transport_value, custom_preferences
             )
-            
-            new_night_itineraries = None
-            if generate_nightlife:
-                new_night_itineraries = create_night_itinerary(
-                    destination, country, start_date.strftime("%Y-%m-%d"), 
-                    end_date.strftime("%Y-%m-%d"), hotel_name, purpose_of_stay, 
-                    mode_of_transport_value, custom_preferences
-                )
-            
-            st.session_state.all_generated_itineraries.append((new_day_itineraries, new_night_itineraries))
+            st.session_state.all_generated_itineraries.append(new_itineraries)
             st.session_state.itinerary_set_count += 1
             st.success(f"Itinerary set {st.session_state.itinerary_set_count} generated successfully!")
         except Exception as e:
@@ -640,31 +629,18 @@ if st.sidebar.button("Generate Itinerary"):
             st.sidebar.error(f"Exception type: {type(e)}")
             st.sidebar.error(f"Exception traceback: {traceback.format_exc()}")
 
-
 if st.session_state.all_generated_itineraries:
     st.subheader("VoyagerAI's Response")
+    
+    # Create the table data
+    table_data = []
     
     # Display the most recently generated itinerary set
     most_recent_set = st.session_state.all_generated_itineraries[-1]
     st.write("## Most Recent Itinerary Set")
-    
-    for itinerary_number, (day_itinerary, night_itinerary) in enumerate(most_recent_set, 1):
-        st.write(f"### Itinerary {itinerary_number}")
-        
-        if night_itinerary:
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                st.write("#### Day Itinerary")
-                display_itinerary(day_itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport)
-            
-            with col2:
-                st.write("#### Night Itinerary")
-                display_itinerary(night_itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport)
-        else:
-            st.write("#### Day Itinerary")
-            display_itinerary(day_itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport)
-
+    for itinerary_number, itinerary in enumerate(most_recent_set, 1):
+        with st.expander(f"Itinerary {itinerary_number}", expanded=True):
+            table_data.extend(display_itinerary(itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport))
 
     # Display all previously generated itinerary sets in reverse order
     if len(st.session_state.all_generated_itineraries) > 1:
