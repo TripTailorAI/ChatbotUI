@@ -655,28 +655,33 @@ if st.session_state.all_generated_itineraries:
     
     if isinstance(most_recent_set, dict):
         day_itineraries = most_recent_set.get('day', [])
-        night_itineraries = most_recent_set.get('night')
+        night_itineraries = most_recent_set.get('night') if st.session_state.generate_nightlife else None
     else:
         day_itineraries = most_recent_set
         night_itineraries = None
 
     for itinerary_number, day_itinerary in enumerate(day_itineraries, 1):
         with st.expander(f"Itinerary {itinerary_number}", expanded=True):
-            col1, col2 = st.columns(2)
-            
-            with col1:
+            if st.session_state.generate_nightlife:
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.write("#### Day Itinerary")
+                    day_data = display_itinerary(day_itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport)
+                    table_data.extend(day_data)
+                
+                with col2:
+                    st.write("#### Night Itinerary")
+                    if night_itineraries and itinerary_number <= len(night_itineraries):
+                        night_itinerary = night_itineraries[itinerary_number - 1]
+                        night_data = display_itinerary(night_itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport)
+                        table_data.extend(night_data)
+                    else:
+                        st.write("No nightlife itinerary for this day.")
+            else:
                 st.write("#### Day Itinerary")
                 day_data = display_itinerary(day_itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport)
                 table_data.extend(day_data)
-            
-            with col2:
-                st.write("#### Night Itinerary")
-                if night_itineraries and itinerary_number <= len(night_itineraries):
-                    night_itinerary = night_itineraries[itinerary_number - 1]
-                    night_data = display_itinerary(night_itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport)
-                    table_data.extend(night_data)
-                else:
-                    st.write("No nightlife itinerary for this day.")
 
     # Display all previously generated itinerary sets in reverse order
     if len(st.session_state.all_generated_itineraries) > 1:
@@ -685,28 +690,33 @@ if st.session_state.all_generated_itineraries:
             st.write(f"### Itinerary Set {set_number}")
             if isinstance(itinerary_set, dict):
                 day_itineraries = itinerary_set.get('day', [])
-                night_itineraries = itinerary_set.get('night')
+                night_itineraries = itinerary_set.get('night') if st.session_state.generate_nightlife else None
             else:
                 day_itineraries = itinerary_set
                 night_itineraries = None
             
             for itinerary_number, day_itinerary in enumerate(day_itineraries, 1):
                 with st.expander(f"Itinerary {itinerary_number}", expanded=False):
-                    col1, col2 = st.columns(2)
-                    
-                    with col1:
+                    if st.session_state.generate_nightlife:
+                        col1, col2 = st.columns(2)
+                        
+                        with col1:
+                            st.write("#### Day Itinerary")
+                            day_data = display_itinerary(day_itinerary, set_number, itinerary_number, mode_of_transport)
+                            table_data.extend(day_data)
+                        
+                        with col2:
+                            st.write("#### Night Itinerary")
+                            if night_itineraries and itinerary_number <= len(night_itineraries):
+                                night_itinerary = night_itineraries[itinerary_number - 1]
+                                night_data = display_itinerary(night_itinerary, set_number, itinerary_number, mode_of_transport)
+                                table_data.extend(night_data)
+                            else:
+                                st.write("No nightlife itinerary for this day.")
+                    else:
                         st.write("#### Day Itinerary")
                         day_data = display_itinerary(day_itinerary, set_number, itinerary_number, mode_of_transport)
                         table_data.extend(day_data)
-                    
-                    with col2:
-                        st.write("#### Night Itinerary")
-                        if night_itineraries and itinerary_number <= len(night_itineraries):
-                            night_itinerary = night_itineraries[itinerary_number - 1]
-                            night_data = display_itinerary(night_itinerary, set_number, itinerary_number, mode_of_transport)
-                            table_data.extend(night_data)
-                        else:
-                            st.write("No nightlife itinerary for this day.")
 
     # Create the DataFrame
     dfi = pd.DataFrame(table_data, columns=['Date', 'Weather', 'Time', 'Activity', 'Place', 'Address', 'Opening Hours'])
@@ -714,8 +724,9 @@ if st.session_state.all_generated_itineraries:
     # Add the generated itineraries to the message history
     if st.session_state.all_generated_itineraries:
         total_itineraries = sum(len(itinerary_set) if isinstance(itinerary_set, list) else len(itinerary_set.get('day', [])) for itinerary_set in st.session_state.all_generated_itineraries)
-        nightlife_itineraries = sum(len(itinerary_set['night']) for itinerary_set in st.session_state.all_generated_itineraries if isinstance(itinerary_set, dict) and 'night' in itinerary_set)
-        total_itineraries += nightlife_itineraries
+        if st.session_state.generate_nightlife:
+            nightlife_itineraries = sum(len(itinerary_set['night']) for itinerary_set in st.session_state.all_generated_itineraries if isinstance(itinerary_set, dict) and 'night' in itinerary_set)
+            total_itineraries += nightlife_itineraries
         
     st.session_state.messages.append({
         "role": "assistant",
