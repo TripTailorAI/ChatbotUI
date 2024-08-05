@@ -613,7 +613,9 @@ mode_of_transport_value = transport_modes[mode_of_transport]
 custom_preferences = st.sidebar.text_area("✨ Custom Preferences", 
     "Enter any special requirements or preferences for your trip here.")
 generate_nightlife = st.sidebar.checkbox("🌙 Generate Nightlife Itinerary", value=False)
-
+# Add this with your other sidebar inputs
+if 'generate_nightlife' not in st.session_state:
+    st.session_state.generate_nightlife = False
 
 if st.sidebar.button("Generate Itinerary"):
     with st.spinner("Generating itinerary, please wait..."):
