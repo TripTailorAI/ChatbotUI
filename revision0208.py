@@ -548,7 +548,7 @@ def send_to_gsheets():
         df = generate_df(most_recent_set)
         
         # Use the service account info from secrets directly
-        credentials = st.secrets["gcp_service_account"]
+        credentials = connect(**st.secrets.gcp_service_account)
         
         # Remove json.loads() here
         gc = pygsheets.authorize(service_account_info=credentials)
