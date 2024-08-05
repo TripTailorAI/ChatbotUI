@@ -653,8 +653,8 @@ if st.session_state.all_generated_itineraries:
     most_recent_set = st.session_state.all_generated_itineraries[-1]
     st.write("## Most Recent Itinerary Set")
     
-    day_itineraries = most_recent_set['day']
-    night_itineraries = most_recent_set['night']
+    day_itineraries = most_recent_set.get('day', most_recent_set)  # Fallback for old format
+    night_itineraries = most_recent_set.get('night')
 
     for itinerary_number, day_itinerary in enumerate(day_itineraries, 1):
         with st.expander(f"Itinerary {itinerary_number}", expanded=True):
@@ -679,8 +679,8 @@ if st.session_state.all_generated_itineraries:
         st.write("## Previously Generated Itinerary Sets")
         for set_number, itinerary_set in reversed(list(enumerate(st.session_state.all_generated_itineraries[:-1], 1))):
             st.write(f"### Itinerary Set {set_number}")
-            day_itineraries = itinerary_set['day']
-            night_itineraries = itinerary_set['night']
+            day_itineraries = itinerary_set.get('day', itinerary_set)  # Fallback for old format
+            night_itineraries = itinerary_set.get('night')
             
             for itinerary_number, day_itinerary in enumerate(day_itineraries, 1):
                 with st.expander(f"Itinerary {itinerary_number}", expanded=False):
@@ -705,9 +705,9 @@ if st.session_state.all_generated_itineraries:
     
     # Add the generated itineraries to the message history
     if st.session_state.all_generated_itineraries:
-        total_itineraries = sum(len(itinerary_set['day']) for itinerary_set in st.session_state.all_generated_itineraries)
-        if generate_nightlife:
-            total_itineraries += sum(len(itinerary_set['night']) for itinerary_set in st.session_state.all_generated_itineraries if itinerary_set['night'])
+        total_itineraries = sum(len(itinerary_set.get('day', itinerary_set)) for itinerary_set in st.session_state.all_generated_itineraries)
+        nightlife_itineraries = sum(len(itinerary_set['night']) for itinerary_set in st.session_state.all_generated_itineraries if isinstance(itinerary_set, dict) and 'night' in itinerary_set)
+        total_itineraries += nightlife_itineraries
         
     st.session_state.messages.append({
         "role": "assistant",
