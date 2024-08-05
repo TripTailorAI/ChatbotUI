@@ -656,7 +656,7 @@ if st.session_state.all_generated_itineraries:
         if send_to_gsheets():
             st.sidebar.success("Most recent itinerary set exported successfully!")
         else:
-        st.sidebar.error("No itineraries to export. Please generate an itinerary first.")
+            st.sidebar.error("No itineraries to export. Please generate an itinerary first.")
 
     #Google Sheets Imports 
 
