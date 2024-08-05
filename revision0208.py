@@ -533,10 +533,10 @@ def generate_df(itineraries):
     for i, itinerary in enumerate(itineraries, 1):
         for day in itinerary:
             for j, activity in enumerate(day['activities'], 1):
-            itinerary_data.append([i,day['date'],day['weather']
-                                    ,activity['time'],activity['activity']
-                                    ,activity['place']['name'],activity['place']['url'],activity['place']['formatted_address']
-                                    ,activity['opening_hours']])
+                itinerary_data.append([i,day['date'],day['weather']
+                                        ,activity['time'],activity['activity']
+                                        ,activity['place']['name'],activity['place']['url'],activity['place']['formatted_address']
+                                        ,activity['opening_hours']])
     df = pd.DataFrame(itinerary_data)
     df.columns = columns
     return df
