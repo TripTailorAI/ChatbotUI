@@ -547,11 +547,13 @@ def send_to_gsheets():
         most_recent_set = st.session_state.all_generated_itineraries[-1]
         df = generate_df(most_recent_set)
         
-        # Use the service account info from secrets
+        # Use the service account info from secrets directly
         credentials = st.secrets["gcp_service_account"]
-        # credentials = Credentials.from_service_account_info(service_account_info)
         
-        gc = pygsheets.authorize(service_account_info=json.loads(credentials))
+        # Remove json.loads() here
+        gc = pygsheets.authorize(service_account_info=credentials)
+        
+        # Rest of your function remains the same
         sheet_id = '1Mw_kkGf8Z5qN2RGhOzIM04zEN30cZIznrOfjWPwNluc'
         worksheet_name = 'Base_Day'
         sh = gc.open_by_key(sheet_id)
