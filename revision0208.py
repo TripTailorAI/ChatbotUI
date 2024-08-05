@@ -547,11 +547,16 @@ def send_to_gsheets():
         most_recent_set = st.session_state.all_generated_itineraries[-1]
         df = generate_df(most_recent_set)
         
-        # Use the service account info from secrets directly
-        credentials = connect(**st.secrets.gcp_service_account)
+        service_account_info = st.secrets["gcp_service_account"]
         
-        # Remove json.loads() here
-        gc = pygsheets.authorize(credentials)
+        # Create credentials object
+        credentials = Credentials.from_service_account_info(
+            service_account_info,
+            scopes=['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
+        )
+        
+        # Authorize with pygsheets using the credentials
+        gc = pygsheets.authorize(custom_credentials=credentials)
         
         # Rest of your function remains the same
         sheet_id = '1Mw_kkGf8Z5qN2RGhOzIM04zEN30cZIznrOfjWPwNluc'
