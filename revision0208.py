@@ -620,7 +620,19 @@ if st.session_state.all_generated_itineraries:
     
     #st.subheader("Itinerary Overview")
     #st.dataframe(dfi)
-    
+        # Add the generated itineraries to the message history
+    if st.session_state.all_generated_itineraries:
+        total_itineraries = sum(len(itinerary_set) for itinerary_set in st.session_state.all_generated_itineraries)
+        
+    st.session_state.messages.append({
+        "role": "assistant",
+        "content": f"Generated {len(st.session_state.all_generated_itineraries)} set(s) of itineraries for {destination}, {country}. Total itineraries: {total_itineraries}."
+    })
+
+    if st.sidebar.button("Export All Itineraries", key="export_all_itineraries"):
+        send_to_gsheets(itineraries)
+        st.sidebar.success("All itineraries exported successfully!")
+
     #Google Sheets Imports 
 def send_to_gsheets(itineraries):
     df = generate_df(itineraries)
@@ -640,17 +652,5 @@ def send_to_gsheets(itineraries):
     wks.update_value("B3",start_date)
     wks.update_value("B4",end_date)
 
-    # Add the generated itineraries to the message history
-    if st.session_state.all_generated_itineraries:
-        total_itineraries = sum(len(itinerary_set) for itinerary_set in st.session_state.all_generated_itineraries)
-        
-    st.session_state.messages.append({
-        "role": "assistant",
-        "content": f"Generated {len(st.session_state.all_generated_itineraries)} set(s) of itineraries for {destination}, {country}. Total itineraries: {total_itineraries}."
-    })
-
-    if st.sidebar.button("Export All Itineraries", key="export_all_itineraries"):
-        send_to_gsheets(itineraries)
-        st.sidebar.success("All itineraries exported successfully!")
 
    
