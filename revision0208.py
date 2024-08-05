@@ -653,7 +653,6 @@ if st.session_state.all_generated_itineraries:
 
     #Google Sheets Imports 
 
-<<<<<<< HEAD
 
     # Add the generated itineraries to the message history
     if st.session_state.all_generated_itineraries:
@@ -663,7 +662,5 @@ if st.session_state.all_generated_itineraries:
         "role": "assistant",
         "content": f"Generated {len(st.session_state.all_generated_itineraries)} set(s) of itineraries for {destination}, {country}. Total itineraries: {total_itineraries}."
     })
-=======
->>>>>>> 8c0876bb658e9338d59f7198dec7e7c2675817f9
 
    
