@@ -744,10 +744,23 @@ if st.session_state.all_generated_itineraries:
     
     # Add the generated itineraries to the message history
     if st.session_state.all_generated_itineraries:
-        total_itineraries = sum(len(itinerary_set) if isinstance(itinerary_set, list) else len(itinerary_set.get('day', [])) for itinerary_set in st.session_state.all_generated_itineraries)
-        if st.session_state.generate_nightlife:
-            nightlife_itineraries = sum(len(itinerary_set['night']) for itinerary_set in st.session_state.all_generated_itineraries if isinstance(itinerary_set, dict) and 'night' in itinerary_set)
-            total_itineraries += nightlife_itineraries
+        total_itineraries = sum(len(itinerary_set) for itinerary_set in st.session_state.all_generated_itineraries)
+        
+    st.session_state.messages.append({
+        "role": "assistant",
+        "content": f"Generated {len(st.session_state.all_generated_itineraries)} set(s) of itineraries for {destination}, {country}. Total itineraries: {total_itineraries}."
+    })
+
+    if st.sidebar.button("Export All Itineraries", key="export_all_itineraries"):
+        if send_to_gsheets():
+            st.sidebar.success("Most recent itinerary set exported successfully!")
+        else:
+            st.sidebar.error("No itineraries to export. Please generate an itinerary first.")
+
+
+    # Add the generated itineraries to the message history
+    if st.session_state.all_generated_itineraries:
+        total_itineraries = sum(len(itinerary_set) for itinerary_set in st.session_state.all_generated_itineraries)
         
     st.session_state.messages.append({
         "role": "assistant",
