@@ -675,7 +675,7 @@ if st.session_state.all_generated_itineraries:
     st.write("## Most Recent Itinerary Set")
     
     if isinstance(most_recent_set, dict):
-        day_itineraries = most_recent_set.get('day')
+        day_itineraries = most_recent_set.get('day', [])
         night_itineraries = most_recent_set.get('night') if st.session_state.generate_nightlife else None
     else:
         day_itineraries = most_recent_set
