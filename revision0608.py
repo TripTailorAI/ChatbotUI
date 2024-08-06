@@ -45,6 +45,9 @@ if 'itinerary_set_count' not in st.session_state:
 if 'custom_preferences' not in st.session_state:
     st.session_state.custom_preferences = ""
 
+if 'generate_nightlife' not in st.session_state:
+    st.session_state.generate_nightlife = False
+
 # List of all countries
 countries = sorted([country.name for country in pycountry.countries])
 
@@ -620,11 +623,11 @@ custom_preferences = st.sidebar.text_input("✨ Custom Preferences",
     key="custom_pref_input",
     help="Enter any special requirements or preferences for your trip here.")
 
+
 # With these lines
 st.session_state.generate_nightlife = st.sidebar.checkbox("🌙 Generate Nightlife Itinerary", value=st.session_state.generate_nightlife)
 
-if 'generate_nightlife' not in st.session_state:
-    st.session_state.generate_nightlife = False
+
 
 if st.sidebar.button("Generate Itinerary"):
     with st.spinner("Generating itinerary, please wait..."):
