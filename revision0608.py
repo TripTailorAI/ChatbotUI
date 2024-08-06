@@ -328,14 +328,20 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
                             if "duration" in element:
                                 duration = element["duration"]["text"]
                                 duration_value = element["duration"]["value"]
-                                verified_itinerary[i]['duration_to_next'] = duration
-                                verified_itinerary[i]['duration_to_next_value'] = duration_value
+                                
+                                # Check if the duration is very short (less than 2 minutes)
+                                if duration_value < 120:
+                                    verified_itinerary[i]['duration_to_next'] = "Nearby"
+                                    verified_itinerary[i]['duration_to_next_value'] = 0
+                                else:
+                                    verified_itinerary[i]['duration_to_next'] = duration
+                                    verified_itinerary[i]['duration_to_next_value'] = duration_value
                             else:
-                                verified_itinerary[i]['duration_to_next'] = "Unable to calculate duration"
-                                verified_itinerary[i]['duration_to_next_value'] = float('inf')
+                                verified_itinerary[i]['duration_to_next'] = "Nearby"
+                                verified_itinerary[i]['duration_to_next_value'] = 0
                         else:
-                            verified_itinerary[i]['duration_to_next'] = "Route not found"
-                            verified_itinerary[i]['duration_to_next_value'] = float('inf')
+                            verified_itinerary[i]['duration_to_next'] = "Nearby"
+                            verified_itinerary[i]['duration_to_next_value'] = 0
                     else:
                         verified_itinerary[i]['duration_to_next'] = f"API Error: {distance_data['status']}"
                         verified_itinerary[i]['duration_to_next_value'] = float('inf')
@@ -586,10 +592,10 @@ def send_to_gsheets():
         return False
     
 # Streamlit app
-st.title("VoyagerAI🌎")
+st.title("TripTailorAI🌎")
 # Short instructions
 st.write("""
-💡 **How to use VoyagerAI:**
+💡 **How to use TripTailorAI:**
 1. Fill in your trip details in the sidebar
 2. Add any custom preferences
 3. Click 'Generate Itinerary'
@@ -606,8 +612,9 @@ country = st.sidebar.selectbox("🏳️ Country", countries)
 destination = st.sidebar.text_input("🏙️ Destination", "")
 hotel_name = st.sidebar.text_input("🏨 Hotel Name", "")
 today = date.today()
-start_date = st.sidebar.date_input("🗓️ Start Date", min_value=today, value=today)
-end_date = st.sidebar.date_input("🗓️ End Date", min_value=start_date, value=start_date)
+tomorrow = today + timedelta(days=1)
+start_date = st.sidebar.date_input("🗓️ Start Date", min_value=tomorrow, value=tomorrow)
+end_date = st.sidebar.date_input("🗓️ End Date", min_value=tomorrow, value=tomorrow)
 purpose_of_stay = st.sidebar.selectbox("🎯 Purpose of Stay", ["Vacation", "Business"])
 transport_modes = {
     "🚗 Driving": "driving",
@@ -658,7 +665,7 @@ if st.sidebar.button("Generate Itinerary"):
             st.sidebar.error(f"Exception traceback: {traceback.format_exc()}")
 
 if st.session_state.all_generated_itineraries:
-    st.subheader("VoyagerAI's Response")
+    st.subheader("TripTailorAI's Response")
     
     # Create the table data
     table_data = []
