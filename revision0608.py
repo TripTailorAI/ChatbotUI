@@ -526,11 +526,11 @@ def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport
     
     col1, col2 = st.columns(2)
     with col1:
-        if st.button(f"Export Itinerary {itinerary_number} as PDF 📄", key=f"export_pdf_{set_number}_{itinerary_number}"):
+        if st.button(f"Export Itinerary {itinerary_number} as PDF 📄",  key=f"export_pdf_{set_number}_{itinerary_number}_{id(itinerary)}"):
             # Implement PDF export logic here
             st.success(f"Itinerary {itinerary_number} from Set {set_number} exported as PDF.")
     with col2:
-        if st.button(f"Send Itinerary {itinerary_number} via Email 📧", key=f"send_email_{set_number}_{itinerary_number}"):
+        if st.button(f"Send Itinerary {itinerary_number} via Email 📧", key=f"send_email_{set_number}_{itinerary_number}_{id(itinerary)}")):
             send_to_gsheets()
             st.success(f"Itinerary {itinerary_number} from Set {set_number} sent via email.")
     
