@@ -4,7 +4,7 @@ import json
 import pandas as pd
 import random
 import google.generativeai as genai
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import traceback
 import time
 import pycountry
@@ -605,9 +605,9 @@ email_address = st.sidebar.text_input("📧 Email Address", "Enter your email ad
 country = st.sidebar.selectbox("🏳️ Country", countries)
 destination = st.sidebar.text_input("🏙️ Destination", "")
 hotel_name = st.sidebar.text_input("🏨 Hotel Name", "")
-today = time.strftime("%Y-%m-%d") 
-start_date = st.sidebar.date_input("🗓️ Start Date", min_value=today)
-end_date = st.sidebar.date_input("🗓️ End Date", min_value=start_date)
+today = date.today()
+start_date = st.sidebar.date_input("🗓️ Start Date", min_value=today, value=today)
+end_date = st.sidebar.date_input("🗓️ End Date", min_value=start_date, value=start_date)
 purpose_of_stay = st.sidebar.selectbox("🎯 Purpose of Stay", ["Vacation", "Business"])
 transport_modes = {
     "🚗 Driving": "driving",
