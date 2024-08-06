@@ -27,7 +27,8 @@ weather_api_key = st.secrets['WEATHER']
 # google_places_api_key = userdata.get('MAPS_API_KEY')
 # weather_api_key = userdata.get('WEATHER')
 
-# Initialize session state for message history
+st.set_page_config(layout="wide")
+
 if 'messages' not in st.session_state:
     st.session_state.messages = []
 
@@ -39,6 +40,9 @@ if 'all_generated_itineraries' not in st.session_state:
 
 if 'itinerary_set_count' not in st.session_state:
     st.session_state.itinerary_set_count = 0
+
+if 'custom_preferences' not in st.session_state:
+    st.session_state.custom_preferences = ""
 
 # List of all countries
 countries = sorted([country.name for country in pycountry.countries])
@@ -597,8 +601,8 @@ email_address = st.sidebar.text_input("📧 Email Address", "Enter your email ad
 country = st.sidebar.selectbox("🏳️ Country", countries)
 destination = st.sidebar.text_input("🏙️ Destination", "")
 hotel_name = st.sidebar.text_input("🏨 Hotel Name", "")
-start_date = st.sidebar.date_input("🗓️ Start Date")
-end_date = st.sidebar.date_input("🗓️ End Date")
+start_date = st.sidebar.date_input("🗓️ Start Date", min_value=today)
+end_date = st.sidebar.date_input("🗓️ End Date", min_value=start_date)
 purpose_of_stay = st.sidebar.selectbox("🎯 Purpose of Stay", ["Vacation", "Business"])
 transport_modes = {
     "🚗 Driving": "driving",
@@ -609,11 +613,13 @@ transport_modes = {
 mode_of_transport = st.sidebar.selectbox("🚀 Mode of Transportation", list(transport_modes.keys()))
 mode_of_transport_value = transport_modes[mode_of_transport]
 
-# Custom preferences input
-custom_preferences = st.sidebar.text_area("✨ Custom Preferences", 
-    "Enter any special requirements or preferences for your trip here.")
+custom_preferences = st.sidebar.text_input("✨ Custom Preferences", 
+    value=st.session_state.custom_preferences,
+    key="custom_pref_input",
+    help="Enter any special requirements or preferences for your trip here.")
+
 # With these lines
-st.session_state.generate_nightlife = st.sidebar.checkbox("🌙 Generate Nightlife Itinerary", value=st.session_state.get('generate_nightlife', False))
+st.session_state.generate_nightlife = st.sidebar.checkbox("🌙 Generate Nightlife Itinerary", value=st.session_state.generate_nightlife)
 
 if 'generate_nightlife' not in st.session_state:
     st.session_state.generate_nightlife = False
@@ -628,7 +634,7 @@ if st.sidebar.button("Generate Itinerary"):
             )
             
             new_night_itineraries = None
-            if generate_nightlife:
+            if st.session_state.generate_nightlife:
                 new_night_itineraries = create_night_itinerary(
                     destination, country, start_date.strftime("%Y-%m-%d"), 
                     end_date.strftime("%Y-%m-%d"), hotel_name, purpose_of_stay, 
@@ -669,12 +675,12 @@ if st.session_state.all_generated_itineraries:
                 col1, col2 = st.columns(2)
                 
                 with col1:
-                    st.write("#### Day Itinerary")
+                    st.write("#### 🌇 Day Itinerary")
                     day_data = display_itinerary(day_itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport)
                     table_data.extend(day_data)
                 
                 with col2:
-                    st.write("#### Night Itinerary")
+                    st.write("#### 🌃 Night Itinerary ")
                     if night_itineraries and itinerary_number <= len(night_itineraries):
                         night_itinerary = night_itineraries[itinerary_number - 1]
                         night_data = display_itinerary(night_itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport)
