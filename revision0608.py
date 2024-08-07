@@ -478,8 +478,7 @@ def create_night_itinerary(destination, country, start_date, end_date, hotel_nam
                 if item['place'] in all_used_places:
                     continue
 
-                check_time = datetime.strptime(f"{current_date} {item['time']}", "%Y-%m-%d %H:%M")
-                place_details = get_place_details(f"{item['place']} in {destination}, {country}", f"{destination}, {country}", check_time=check_time)
+                place_details = get_place_details(f"{item['place']} in {destination}, {country}", f"{destination}, {country}")
                 
                 if place_details['opening_hours']['open_now']:
                     opening_hours = get_place_opening_hours(place_details, current_date)
