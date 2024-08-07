@@ -607,37 +607,32 @@ def generate_df(all_itineraries):
     columns = ['itinerary_version', 'date', 'weather', 'time', 'activity', 'place', 'MapsLink', 'Address', 'Hours', 'is_night']
     
     for i, itinerary in enumerate(all_itineraries, 1):
-        # Process day itinerary
-        for day in itinerary['day']:
-            for activity in day['activities']:
-                itinerary_data.append([
-                    i,
-                    day['date'],
-                    day['weather'],
-                    activity['time'],
-                    activity['activity'],
-                    activity['place']['name'],
-                    activity['place']['url'],
-                    activity['place']['formatted_address'],
-                    activity['opening_hours'],
-                    False  # is_night
-                ])
-        
-        # Process night itinerary if it exists
-        if itinerary['night']:
-            for night in itinerary['night']:
-                for activity in night['activities']:
+        if isinstance(itinerary, dict):
+            # New structure with day and night
+            for day in itinerary['day']:
+                for activity in day['activities']:
                     itinerary_data.append([
-                        i,
-                        night['date'],
-                        night['weather'],
-                        activity['time'],
-                        activity['activity'],
-                        activity['place']['name'],
-                        activity['place']['url'],
-                        activity['place']['formatted_address'],
-                        activity['opening_hours'],
-                        True  # is_night
+                        i, day['date'], day['weather'], activity['time'], activity['activity'],
+                        activity['place']['name'], activity['place']['url'], 
+                        activity['place']['formatted_address'], activity['opening_hours'], False
+                    ])
+            
+            if itinerary.get('night'):
+                for night in itinerary['night']:
+                    for activity in night['activities']:
+                        itinerary_data.append([
+                            i, night['date'], night['weather'], activity['time'], activity['activity'],
+                            activity['place']['name'], activity['place']['url'], 
+                            activity['place']['formatted_address'], activity['opening_hours'], True
+                        ])
+        else:
+            # Old structure (list of days)
+            for day in itinerary:
+                for activity in day['activities']:
+                    itinerary_data.append([
+                        i, day['date'], day['weather'], activity['time'], activity['activity'],
+                        activity['place']['name'], activity['place']['url'], 
+                        activity['place']['formatted_address'], activity['opening_hours'], False
                     ])
     
     df = pd.DataFrame(itinerary_data, columns=columns)
