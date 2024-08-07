@@ -11,6 +11,12 @@ import pycountry
 import pygsheets
 import json
 from google.oauth2.service_account import Credentials
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from io import BytesIO
 
 #COLAB
 # from google.colab import userdata
@@ -131,6 +137,58 @@ def get_weather_forecast(city):
         print(f"Response content: {response.content}")
         raise e
 
+def create_itinerary_pdf(itinerary, set_number, itinerary_number, mode_of_transport):
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    elements = []
+
+    styles = getSampleStyleSheet()
+    styles.add(ParagraphStyle(name='Center', alignment=1))
+
+    # Title
+    elements.append(Paragraph(f"Itinerary {itinerary_number} from Set {set_number}", styles['Heading1']))
+    elements.append(Spacer(1, 12))
+
+    for day in itinerary:
+        elements.append(Paragraph(f"Date: {day['date']}", styles['Heading2']))
+        elements.append(Paragraph(f"Weather forecast: {day['weather']}", styles['Normal']))
+        elements.append(Spacer(1, 12))
+
+        data = [['Time', 'Activity', 'Place', 'Address', 'Opening Hours', 'Travel Time']]
+        for i, activity in enumerate(day['activities']):
+            row = [
+                activity['time'],
+                activity['activity'],
+                activity['place']['name'],
+                activity['place']['formatted_address'],
+                activity.get('opening_hours', 'N/A'),
+                activity.get('duration_to_next', 'N/A') if i < len(day['activities']) - 1 else 'N/A'
+            ]
+            data.append(row)
+
+        table = Table(data, colWidths=[0.7*inch, 1.5*inch, 1.5*inch, 2*inch, 1.3*inch, 1*inch])
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 14),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 1), (-1, -1), 12),
+            ('TOPPADDING', (0, 1), (-1, -1), 6),
+            ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black)
+        ]))
+        elements.append(table)
+        elements.append(Spacer(1, 12))
+
+    doc.build(elements)
+    buffer.seek(0)
+    return buffer
 
 def get_daily_itinerary(destination, country, date, hotel_name, purpose_of_stay, weather_forecast, day_number, trip_length, used_places, mode_of_transport, custom_preferences):
     used_places_str = ", ".join(used_places)
@@ -542,8 +600,14 @@ def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport
     
     col1, col2 = st.columns(2)
     with col1:
-        if st.button(f"Export Itinerary {itinerary_number} as PDF 📄",  key=f"export_pdf_{set_number}_{itinerary_number}_{id(itinerary)}"):
-            # Implement PDF export logic here
+        if st.button(f"Export Itinerary {itinerary_number} as PDF 📄", key=f"export_pdf_{set_number}_{itinerary_number}_{id(itinerary)}"):
+            pdf_buffer = create_itinerary_pdf(itinerary, set_number, itinerary_number, mode_of_transport)
+            st.download_button(
+                label="Download PDF",
+                data=pdf_buffer,
+                file_name=f"itinerary_{set_number}_{itinerary_number}.pdf",
+                mime="application/pdf"
+            )
             st.success(f"Itinerary {itinerary_number} from Set {set_number} exported as PDF.")
     with col2:
         if st.button(f"Send Itinerary {itinerary_number} via Email 📧", key=f"send_email_{set_number}_{itinerary_number}_{id(itinerary)}"):
@@ -717,12 +781,14 @@ st.session_state.generate_nightlife = st.sidebar.checkbox("🌙 Generate Nightli
 if st.sidebar.button("✍ Generate Itineraries"):
     with st.spinner("Generating itinerary, please wait..."):
         try:
+            start_time = time.time()
             new_day_itineraries = create_travel_itinerary(
                 destination, country, start_date.strftime("%Y-%m-%d"), 
                 end_date.strftime("%Y-%m-%d"), hotel_name, purpose_of_stay, 
                 mode_of_transport_value, custom_preferences
             )
-            
+            day_time = time.time() - start_time
+
             new_night_itineraries = None
             if st.session_state.generate_nightlife:
                 new_night_itineraries = create_night_itinerary(
@@ -736,6 +802,9 @@ if st.sidebar.button("✍ Generate Itineraries"):
                 'night': new_night_itineraries
             })
             st.session_state.itinerary_set_count += 1
+            end_time = time.time()  # Stop the timer
+            elapsed_time = end_time - start_time  # Calculate elapsed time
+            st.markdown(elapsed_time)
             st.success(f"Itinerary set {st.session_state.itinerary_set_count} generated successfully!")
         except Exception as e:
             st.sidebar.error(f"An error occurred while creating the itinerary: {str(e)}")
