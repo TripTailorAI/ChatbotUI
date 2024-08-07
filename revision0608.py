@@ -266,7 +266,8 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
     all_used_places = set()  # Track used places across all itineraries
 
     for itinerary_version in range(3):
-        itinerary = []
+        day_itinerary = []
+        night_itinerary = []
         used_places = set()  # Track used places for this itinerary
 
         for day in range(num_days):
@@ -281,84 +282,98 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
             daily_itinerary = get_daily_itinerary(destination, country, current_date, hotel_name, purpose_of_stay, weather_summary, day + 1, num_days, all_used_places, mode_of_transport, custom_preferences)
 
             if daily_itinerary is None:
-                # print(f"Error: Failed to get itinerary from GeminiAI for {current_date}")
                 print(f"Skipping this day in the itinerary.")
                 continue
 
-            verified_itinerary = []
-            for item in daily_itinerary.values():
-                if item['place'] in all_used_places:
-                    # print(f"Skipping repeated place: {item['place']}")
-                    continue
-
-                place_details = get_place_details(f"{item['place']} in {destination}, {country}", f"{destination}, {country}")
-                selected_place = place_details
-                opening_hours = get_place_opening_hours(selected_place, current_date)
-                verified_itinerary.append({
-                    'time': item['time'],
-                    'activity': item['activity'],
-                    'place': selected_place,
-                    'opening_hours': opening_hours,
-                    'time_int': item['time_int'],
-                    'approx_distance': item['approx_distance']
-                })
-                all_used_places.add(item['place'])  # Add to all used places
-                used_places.add(item['place'])
-
-            # Only process travel times if there are activities
-            if verified_itinerary:
-                for i in range(len(verified_itinerary) - 1):
-                    origin = verified_itinerary[i]['place']['formatted_address']
-                    destination = verified_itinerary[i + 1]['place']['formatted_address']
-                    dep_time = verified_itinerary[i + 1]['time_int']
-                    act_time = verified_itinerary[i + 1]['time']
-                    date_time = current_date+' '+act_time+':00'
-                    pattern = '%Y-%m-%d %H:%M:%S'
-                    epoch = int(time.mktime(time.strptime(date_time, pattern)))
-                    url = f"https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin}&destinations={destination}&mode={mode_of_transport}&key={google_places_api_key}&departure_time={epoch}"
-                    response = requests.get(url)
-                    distance_data = response.json()
-
-                    if distance_data["status"] == "OK":
-                        if (distance_data.get("rows") and
-                            distance_data["rows"][0].get("elements") and
-                            distance_data["rows"][0]["elements"][0].get("status") == "OK"):
-
-                            element = distance_data["rows"][0]["elements"][0]
-                            if "duration" in element:
-                                duration = element["duration"]["text"]
-                                duration_value = element["duration"]["value"]
-                                
-                                # Check if the duration is very short (less than 2 minutes)
-                                if duration_value < 120:
-                                    verified_itinerary[i]['duration_to_next'] = "Nearby"
-                                    verified_itinerary[i]['duration_to_next_value'] = 0
-                                else:
-                                    verified_itinerary[i]['duration_to_next'] = duration
-                                    verified_itinerary[i]['duration_to_next_value'] = duration_value
-                            else:
-                                verified_itinerary[i]['duration_to_next'] = "Nearby"
-                                verified_itinerary[i]['duration_to_next_value'] = 0
-                        else:
-                            verified_itinerary[i]['duration_to_next'] = "Nearby"
-                            verified_itinerary[i]['duration_to_next_value'] = 0
-                    else:
-                        verified_itinerary[i]['duration_to_next'] = f"API Error: {distance_data['status']}"
-                        verified_itinerary[i]['duration_to_next_value'] = float('inf')
-
-                # Set the last activity's duration to "N/A" only if there are activities
-                verified_itinerary[-1]['duration_to_next'] = "N/A"
-                verified_itinerary[-1]['duration_to_next_value'] = 0
-
-            itinerary.append({
+            verified_day_itinerary = process_and_verify_itinerary(daily_itinerary, destination, country, current_date, all_used_places, used_places, mode_of_transport)
+            
+            day_itinerary.append({
                 'date': current_date,
                 'weather': weather_summary,
-                'activities': verified_itinerary
+                'activities': verified_day_itinerary
             })
 
-        all_itineraries.append(itinerary)
-    print(all_itineraries)
+            if st.session_state.generate_nightlife:
+                nightly_itinerary = get_nightlife_itinerary(destination, country, current_date, hotel_name, purpose_of_stay, weather_summary, day + 1, num_days, all_used_places, mode_of_transport, custom_preferences)
+                
+                if nightly_itinerary is not None:
+                    verified_night_itinerary = process_and_verify_itinerary(nightly_itinerary, destination, country, current_date, all_used_places, used_places, mode_of_transport)
+                    
+                    night_itinerary.append({
+                        'date': current_date,
+                        'weather': weather_summary,
+                        'activities': verified_night_itinerary
+                    })
+
+        all_itineraries.append({
+            'day': day_itinerary,
+            'night': night_itinerary if st.session_state.generate_nightlife else None
+        })
+
     return all_itineraries
+
+def process_and_verify_itinerary(itinerary, destination, country, current_date, all_used_places, used_places, mode_of_transport):
+    verified_itinerary = []
+    for item in itinerary.values():
+        if item['place'] in all_used_places:
+            continue
+
+        place_details = get_place_details(f"{item['place']} in {destination}, {country}", f"{destination}, {country}")
+        selected_place = place_details
+        opening_hours = get_place_opening_hours(selected_place, current_date)
+        verified_itinerary.append({
+            'time': item['time'],
+            'activity': item['activity'],
+            'place': selected_place,
+            'opening_hours': opening_hours,
+            'time_int': item['time_int'],
+            'approx_distance': item['approx_distance']
+        })
+        all_used_places.add(item['place'])
+        used_places.add(item['place'])
+
+    if verified_itinerary:
+        for i in range(len(verified_itinerary) - 1):
+            origin = verified_itinerary[i]['place']['formatted_address']
+            destination = verified_itinerary[i + 1]['place']['formatted_address']
+            act_time = verified_itinerary[i + 1]['time']
+            date_time = current_date+' '+act_time+':00'
+            pattern = '%Y-%m-%d %H:%M:%S'
+            epoch = int(time.mktime(time.strptime(date_time, pattern)))
+            url = f"https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin}&destinations={destination}&mode={mode_of_transport}&key={google_places_api_key}&departure_time={epoch}"
+            response = requests.get(url)
+            distance_data = response.json()
+
+            if distance_data["status"] == "OK":
+                if (distance_data.get("rows") and
+                    distance_data["rows"][0].get("elements") and
+                    distance_data["rows"][0]["elements"][0].get("status") == "OK"):
+
+                    element = distance_data["rows"][0]["elements"][0]
+                    if "duration" in element:
+                        duration = element["duration"]["text"]
+                        duration_value = element["duration"]["value"]
+                        
+                        if duration_value < 120:
+                            verified_itinerary[i]['duration_to_next'] = "Nearby"
+                            verified_itinerary[i]['duration_to_next_value'] = 0
+                        else:
+                            verified_itinerary[i]['duration_to_next'] = duration
+                            verified_itinerary[i]['duration_to_next_value'] = duration_value
+                    else:
+                        verified_itinerary[i]['duration_to_next'] = "Nearby"
+                        verified_itinerary[i]['duration_to_next_value'] = 0
+                else:
+                    verified_itinerary[i]['duration_to_next'] = "Nearby"
+                    verified_itinerary[i]['duration_to_next_value'] = 0
+            else:
+                verified_itinerary[i]['duration_to_next'] = f"API Error: {distance_data['status']}"
+                verified_itinerary[i]['duration_to_next_value'] = float('inf')
+
+        verified_itinerary[-1]['duration_to_next'] = "N/A"
+        verified_itinerary[-1]['duration_to_next_value'] = 0
+
+    return verified_itinerary
 
 def create_night_itinerary(destination, country, start_date, end_date, hotel_name, purpose_of_stay, mode_of_transport, custom_preferences):
     weather_forecast_data = get_weather_forecast(destination)
@@ -496,37 +511,80 @@ def create_night_itinerary(destination, country, start_date, end_date, hotel_nam
 
 #--------------------------------------------------------------------------------------------#
 def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport):
-    itinerary_message = ""
     day_data = []
-    for day in itinerary:
-        date = day['date']
-        weather = day['weather']
-        itinerary_message += f"**Date:** {date}\n\n"
-        itinerary_message += f"**Weather forecast:** {weather}\n\n"
-        for i, activity in enumerate(day['activities']):
-            time = activity['time']
-            activity_name = activity['activity']
-            place_name = activity['place']['name']
-            address = activity['place']['formatted_address']
-            opening_hours = activity.get('opening_hours', 'N/A')
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.write("#### 🌇 Day Itinerary")
+        # Display day itinerary
+        for day in itinerary['day']:
+            date = day['date']
+            weather = day['weather']
+            st.write(f"**Date:** {date}")
+            st.write(f"**Weather forecast:** {weather}")
             
-            itinerary_message += f"- {time}: {activity_name} at [{place_name}]({activity['place'].get('url', '#')})\n"
-            itinerary_message += f"  - Address: {address}\n"
-            itinerary_message += f"  - Opening Hours: {opening_hours}\n"
-            if i < len(day['activities']) - 1:
-                duration_value = activity.get('duration_to_next_value', float('inf'))
-                duration_text = activity.get('duration_to_next', 'N/A')
-                if duration_value <= 1800:  # 30 minutes or less
-                    color = 'green'
-                elif duration_value <= 3600:  # 1 hour or less
-                    color = 'yellow'
-                else:
-                    color = 'red'
-                itinerary_message += f"  - :clock3: Travel time to next location ({mode_of_transport[:-8]}): <font color='{color}'>{duration_text}</font>\n"
+            for i, activity in enumerate(day['activities']):
+                time = activity['time']
+                activity_name = activity['activity']
+                place_name = activity['place']['name']
+                address = activity['place']['formatted_address']
+                opening_hours = activity.get('opening_hours', 'N/A')
+                
+                st.write(f"- {time}: {activity_name} at [{place_name}]({activity['place'].get('url', '#')})")
+                st.write(f"  - Address: {address}")
+                st.write(f"  - Opening Hours: {opening_hours}")
+                if i < len(day['activities']) - 1:
+                    duration_value = activity.get('duration_to_next_value', float('inf'))
+                    duration_text = activity.get('duration_to_next', 'N/A')
+                    if duration_value <= 1800:  # 30 minutes or less
+                        color = 'green'
+                    elif duration_value <= 3600:  # 1 hour or less
+                        color = 'yellow'
+                    else:
+                        color = 'red'
+                    st.markdown(f"  - :clock3: Travel time to next location ({mode_of_transport[:-8]}): <font color='{color}'>{duration_text}</font>", unsafe_allow_html=True)
+                
+                day_data.append([date, weather, time, activity_name, place_name, address, opening_hours, False])
             
-            day_data.append([date, weather, time, activity_name, place_name, address, opening_hours])
-        
-        itinerary_message += "---\n\n"
+            st.write("---")
+
+    with col2:
+        st.write("#### 🌃 Night Itinerary")
+        # Display night itinerary
+        if itinerary['night']:
+            for night in itinerary['night']:
+                date = night['date']
+                weather = night['weather']
+                st.write(f"**Date:** {date} (Night)")
+                st.write(f"**Weather forecast:** {weather}")
+                
+                for i, activity in enumerate(night['activities']):
+                    time = activity['time']
+                    activity_name = activity['activity']
+                    place_name = activity['place']['name']
+                    address = activity['place']['formatted_address']
+                    opening_hours = activity.get('opening_hours', 'N/A')
+                    
+                    st.write(f"- {time}: {activity_name} at [{place_name}]({activity['place'].get('url', '#')})")
+                    st.write(f"  - Address: {address}")
+                    st.write(f"  - Opening Hours: {opening_hours}")
+                    if i < len(night['activities']) - 1:
+                        duration_value = activity.get('duration_to_next_value', float('inf'))
+                        duration_text = activity.get('duration_to_next', 'N/A')
+                        if duration_value <= 1800:  # 30 minutes or less
+                            color = 'green'
+                        elif duration_value <= 3600:  # 1 hour or less
+                            color = 'yellow'
+                        else:
+                            color = 'red'
+                        st.markdown(f"  - :clock3: Travel time to next location ({mode_of_transport[:-8]}): <font color='{color}'>{duration_text}</font>", unsafe_allow_html=True)
+                    
+                    day_data.append([date, weather, time, activity_name, place_name, address, opening_hours, True])
+                
+                st.write("---")
+        else:
+            st.write("No night itinerary for this day.")
     
     st.markdown(itinerary_message, unsafe_allow_html=True)
     
@@ -543,17 +601,24 @@ def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport
     return day_data
 
 def generate_df(all_itineraries):
-    itinerary_data =[]
-    columns = ['itinerary_version','date','weather','time','activity','place','MapsLink','Address','Hours']
+    itinerary_data = []
+    columns = ['itinerary_version', 'date', 'weather', 'time', 'activity', 'place', 'MapsLink', 'Address', 'Hours', 'is_night']
+    
     for i, itinerary in enumerate(all_itineraries, 1):
-        for day in itinerary:
-            for j, activity in enumerate(day['activities'], 1):
-                itinerary_data.append([i,day['date'],day['weather']
-                                        ,activity['time'],activity['activity']
-                                        ,activity['place']['name'],activity['place']['url'],activity['place']['formatted_address']
-                                        ,activity['opening_hours']])
-    df = pd.DataFrame(itinerary_data)
-    df.columns = columns
+        for day in itinerary['day']:
+            for activity in day['activities']:
+                itinerary_data.append([i, day['date'], day['weather'], activity['time'], activity['activity'],
+                                       activity['place']['name'], activity['place']['url'], 
+                                       activity['place']['formatted_address'], activity['opening_hours'], False])
+        
+        if itinerary['night']:
+            for night in itinerary['night']:
+                for activity in night['activities']:
+                    itinerary_data.append([i, night['date'], night['weather'], activity['time'], activity['activity'],
+                                           activity['place']['name'], activity['place']['url'], 
+                                           activity['place']['formatted_address'], activity['opening_hours'], True])
+    
+    df = pd.DataFrame(itinerary_data, columns=columns)
     return df
 
 def send_to_gsheets():
@@ -674,73 +739,31 @@ if st.session_state.all_generated_itineraries:
     most_recent_set = st.session_state.all_generated_itineraries[-1]
     st.write("## Most Recent Itinerary Set")
     
-    if isinstance(most_recent_set, dict):
-        day_itineraries = most_recent_set.get('day', [])
-        night_itineraries = most_recent_set.get('night') if st.session_state.generate_nightlife else None
-    else:
-        day_itineraries = most_recent_set
-        night_itineraries = None
-
-    for itinerary_number, day_itinerary in enumerate(day_itineraries, 1):
+if st.session_state.all_generated_itineraries:
+    st.subheader("TripTailorAI's Response")
+    
+    # Create the table data
+    table_data = []
+    
+    # Display the most recently generated itinerary set
+    most_recent_set = st.session_state.all_generated_itineraries[-1]
+    st.write("## Most Recent Itinerary Set")
+    
+    for itinerary_number, itinerary in enumerate(most_recent_set, 1):
         with st.expander(f"Itinerary {itinerary_number}", expanded=True):
-            if st.session_state.generate_nightlife:
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    st.write("#### 🌇 Day Itinerary")
-                    day_data = display_itinerary(day_itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport)
-                    table_data.extend(day_data)
-                
-                with col2:
-                    st.write("#### 🌃 Night Itinerary ")
-                    if night_itineraries and itinerary_number <= len(night_itineraries):
-                        night_itinerary = night_itineraries[itinerary_number - 1]
-                        night_data = display_itinerary(night_itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport)
-                        table_data.extend(night_data)
-                    else:
-                        st.write("No nightlife itinerary for this day.")
-            else:
-                st.write("#### Day Itinerary")
-                day_data = display_itinerary(day_itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport)
-                table_data.extend(day_data)
+            table_data.extend(display_itinerary(itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport))
 
     # Display all previously generated itinerary sets in reverse order
     if len(st.session_state.all_generated_itineraries) > 1:
         st.write("## Previously Generated Itinerary Sets")
         for set_number, itinerary_set in reversed(list(enumerate(st.session_state.all_generated_itineraries[:-1], 1))):
             st.write(f"### Itinerary Set {set_number}")
-            if isinstance(itinerary_set, dict):
-                day_itineraries = itinerary_set.get('day', [])
-                night_itineraries = itinerary_set.get('night') if st.session_state.generate_nightlife else None
-            else:
-                day_itineraries = itinerary_set
-                night_itineraries = None
-            
-            for itinerary_number, day_itinerary in enumerate(day_itineraries, 1):
+            for itinerary_number, itinerary in enumerate(itinerary_set, 1):
                 with st.expander(f"Itinerary {itinerary_number}", expanded=False):
-                    if st.session_state.generate_nightlife:
-                        col1, col2 = st.columns(2)
-                        
-                        with col1:
-                            st.write("#### Day Itinerary")
-                            day_data = display_itinerary(day_itinerary, set_number, itinerary_number, mode_of_transport)
-                            table_data.extend(day_data)
-                        
-                        with col2:
-                            st.write("#### Night Itinerary")
-                            if night_itineraries and itinerary_number <= len(night_itineraries):
-                                night_itinerary = night_itineraries[itinerary_number - 1]
-                                night_data = display_itinerary(night_itinerary, set_number, itinerary_number, mode_of_transport)
-                                table_data.extend(night_data)
-                            else:
-                                st.write("No nightlife itinerary for this day.")
-                    else:
-                        st.write("#### Day Itinerary")
-                        day_data = display_itinerary(day_itinerary, set_number, itinerary_number, mode_of_transport)
-                        table_data.extend(day_data)
+                    table_data.extend(display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport))
 
     # Create the DataFrame
-    dfi = pd.DataFrame(table_data, columns=['Date', 'Weather', 'Time', 'Activity', 'Place', 'Address', 'Opening Hours'])
+    dfi = pd.DataFrame(table_data, columns=['Date', 'Weather', 'Time', 'Activity', 'Place', 'Address', 'Opening Hours', 'Is Night'])
     
     # Add the generated itineraries to the message history
     if st.session_state.all_generated_itineraries:
@@ -756,14 +779,4 @@ if st.session_state.all_generated_itineraries:
             st.sidebar.success("Most recent itinerary set exported successfully!")
         else:
             st.sidebar.error("No itineraries to export. Please generate an itinerary first.")
-
-
-    # Add the generated itineraries to the message history
-    if st.session_state.all_generated_itineraries:
-        total_itineraries = sum(len(itinerary_set) for itinerary_set in st.session_state.all_generated_itineraries)
-        
-    st.session_state.messages.append({
-        "role": "assistant",
-        "content": f"Generated {len(st.session_state.all_generated_itineraries)} set(s) of itineraries for {destination}, {country}. Total itineraries: {total_itineraries}."
-    })
    
