@@ -48,6 +48,17 @@ if 'custom_preferences' not in st.session_state:
 if 'generate_nightlife' not in st.session_state:
     st.session_state.generate_nightlife = False
 
+if 'email_address' not in st.session_state:
+    st.session_state.email_address = "Enter your email address here"
+
+if 'email_clicked' not in st.session_state:
+    st.session_state.email_clicked = False
+
+def clear_email():
+    if not st.session_state.email_clicked:
+        st.session_state.email_address = ""
+        st.session_state.email_clicked = True
+
 # List of all countries
 countries = sorted([country.name for country in pycountry.countries])
 
@@ -242,7 +253,7 @@ def is_place_in_location(place, destination, country):
 @st.cache_data(ttl=86400)
 def get_place_opening_hours(place, date):
     if 'opening_hours' not in place or 'periods' not in place['opening_hours']:
-        return "N/A"  # Opening hours not available
+        return "Opening hours not available" 
 
     dt = datetime.strptime(date, "%Y-%m-%d")
     day_of_week = dt.weekday()
@@ -384,28 +395,28 @@ def create_night_itinerary(destination, country, start_date, end_date, hotel_nam
 
             if daily_itinerary is None:
                 print(f"Error: Failed to get itinerary from GeminiAI for {current_date}")
-                # print(f"Skipping this day in the itinerary.")
                 continue
 
             verified_itinerary = []
             for item in daily_itinerary.values():
                 if item['place'] in all_used_places:
-                    # print(f"Skipping repeated place: {item['place']}")
                     continue
 
-                place_details = get_place_details(f"{item['place']} in {destination}, {country}", f"{destination}, {country}")
-                selected_place = place_details
-                opening_hours = get_place_opening_hours(selected_place, current_date)
-                verified_itinerary.append({
-                    'time': item['time'],
-                    'activity': item['activity'],
-                    'place': selected_place,
-                    'opening_hours': opening_hours,
-                    'time_int': item['time_int'],
-                    'approx_distance': item['approx_distance']
-                })
-                all_used_places.add(item['place'])  # Add to all used places
-                used_places.add(item['place'])
+                check_time = datetime.strptime(f"{current_date} {item['time']}", "%Y-%m-%d %H:%M")
+                place_details = get_place_details(f"{item['place']} in {destination}, {country}", f"{destination}, {country}", check_time=check_time)
+                
+                if place_details['opening_hours']['open_now']:
+                    opening_hours = get_place_opening_hours(place_details, current_date)
+                    verified_itinerary.append({
+                        'time': item['time'],
+                        'activity': item['activity'],
+                        'place': place_details,
+                        'opening_hours': opening_hours,
+                        'time_int': item['time_int'],
+                        'approx_distance': item['approx_distance']
+                    })
+                    all_used_places.add(item['place'])  # Add to all used places
+                    used_places.add(item['place'])
 
             # Only process travel times if there are activities
             if verified_itinerary:
@@ -453,7 +464,6 @@ def create_night_itinerary(destination, country, start_date, end_date, hotel_nam
             })
 
         all_itineraries.append(itinerary)
-    print(all_itineraries)
     return all_itineraries
 
 # #COLAB
@@ -660,7 +670,7 @@ st.write("""
 💡 **How to use TripTailorAI:**
 1. Fill in your trip details in the sidebar
 2. Add any custom preferences
-3. Click 'Generate Itinerary'
+3. Click 'Generate Itineraries'
 4. Review and export your personalized travel plans!
 """)
 
@@ -669,7 +679,13 @@ st.sidebar.title("Itinerary Generator")
 
 # Input fields
 # Email address input
-email_address = st.sidebar.text_input("📧 Email Address", "Enter your email address here")
+email_address = st.sidebar.text_input(
+    "📧 Email Address",
+    value=st.session_state.email_address,
+    key="email_input",
+    on_change=clear_email
+)
+st.session_state.email_address = email_address
 country = st.sidebar.selectbox("🏳️ Country", countries)
 destination = st.sidebar.text_input("🏙️ Destination", "")
 hotel_name = st.sidebar.text_input("🏨 Hotel Name", "")
@@ -698,7 +714,7 @@ st.session_state.generate_nightlife = st.sidebar.checkbox("🌙 Generate Nightli
 
 
 
-if st.sidebar.button("Generate Itinerary"):
+if st.sidebar.button("✍ Generate Itineraries"):
     with st.spinner("Generating itinerary, please wait..."):
         try:
             new_day_itineraries = create_travel_itinerary(
@@ -734,7 +750,7 @@ if st.session_state.all_generated_itineraries:
     
     # Display the most recently generated itinerary set
     most_recent_set = st.session_state.all_generated_itineraries[-1]
-    st.write("## Most Recent Itinerary Set")
+    st.write("## Most Recent Itineraries")
     
     if isinstance(most_recent_set, dict):
         day_itineraries = most_recent_set.get('day', [])
@@ -768,7 +784,7 @@ if st.session_state.all_generated_itineraries:
 
     # Display all previously generated itinerary sets in reverse order
     if len(st.session_state.all_generated_itineraries) > 1:
-        st.write("## Previously Generated Itinerary Sets")
+        st.write("## Previously Generated Itineraries")
         for set_number, itinerary_set in reversed(list(enumerate(st.session_state.all_generated_itineraries[:-1], 1))):
             st.write(f"### Itinerary Set {set_number}")
             if isinstance(itinerary_set, dict):
@@ -813,7 +829,7 @@ if st.session_state.all_generated_itineraries:
         "content": f"Generated {len(st.session_state.all_generated_itineraries)} set(s) of itineraries for {destination}, {country}. Total itineraries: {total_itineraries}."
     })
 
-    if st.sidebar.button("Export All Itineraries", key="export_all_itineraries"):
+    if st.sidebar.button("📥Export All Itineraries", key="export_all_itineraries"):
         if send_to_gsheets():
             st.sidebar.success("Most recent itinerary set exported successfully!")
         else:
