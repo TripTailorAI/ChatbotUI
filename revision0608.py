@@ -155,7 +155,7 @@ def create_itinerary_pdf(itinerary, set_number, itinerary_number, mode_of_transp
     styles.add(ParagraphStyle(name='Center', alignment=1, fontName='DejaVuSans', textColor=title_color))
     styles.add(ParagraphStyle(name='Small', fontSize=8, fontName='DejaVuSans'))
     styles.add(ParagraphStyle(name='Thank You', fontSize=14, alignment=1, spaceAfter=12, fontName='DejaVuSans', textColor=title_color))
-
+    styles.add(ParagraphStyle(name='Info', fontSize=10, alignment=1, spaceAfter=12, fontName='DejaVuSans', textColor=colors.HexColor('#1C4E80')))
     # Add thank you message
     elements.append(Paragraph("Thank you for using TripTailorAI!🙌", styles['Thank You']))
     elements.append(Spacer(1, 12))
@@ -203,7 +203,7 @@ def create_itinerary_pdf(itinerary, set_number, itinerary_number, mode_of_transp
 
     info_text = "Did you know that if you press the 'Send all itineraries' button, you'll get all of your itineraries in your email?"
     elements.append(Paragraph(info_text, styles['Info']))
-    
+
     doc.build(elements)
     buffer.seek(0)
     return buffer
