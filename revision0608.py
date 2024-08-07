@@ -480,7 +480,7 @@ def create_night_itinerary(destination, country, start_date, end_date, hotel_nam
 
                 place_details = get_place_details(f"{item['place']} in {destination}, {country}", f"{destination}, {country}")
                 
-                if place_details['opening_hours']['open_now']:
+                if place_details['opening_hours']:
                     opening_hours = get_place_opening_hours(place_details, current_date)
                     verified_itinerary.append({
                         'time': item['time'],
