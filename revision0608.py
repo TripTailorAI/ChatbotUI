@@ -445,7 +445,6 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
             })
 
         all_itineraries.append(itinerary)
-    print(all_itineraries)
     return all_itineraries
 
 def create_night_itinerary(destination, country, start_date, end_date, hotel_name, purpose_of_stay, mode_of_transport, custom_preferences):
