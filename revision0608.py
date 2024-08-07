@@ -158,7 +158,7 @@ def create_itinerary_pdf(itinerary, set_number, itinerary_number, mode_of_transp
     styles.add(ParagraphStyle(name='Thank You', fontSize=14, alignment=1, spaceAfter=12, fontName='DejaVuSans', textColor=title_color))
     styles.add(ParagraphStyle(name='Info', fontSize=10, alignment=1, spaceAfter=12, fontName='DejaVuSans', textColor=colors.HexColor('#1C4E80')))
     # Add thank you message
-    elements.append(Paragraph("Thank you for using TripTailorAI!🙌", styles['Thank You']))
+    elements.append(Paragraph("Thank you for using TripTailorAI!", styles['Thank You']))
     elements.append(Spacer(1, 12))
 
     elements.append(Paragraph(f"Itinerary {itinerary_number} from Set {set_number}", styles['Heading1']))
