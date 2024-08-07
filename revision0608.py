@@ -518,7 +518,8 @@ def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport
     with col1:
         st.write("#### 🌇 Day Itinerary")
         # Display day itinerary
-        for day in itinerary['day']:
+        day_itinerary = itinerary['day'] if isinstance(itinerary, dict) else itinerary
+        for day in day_itinerary:
             date = day['date']
             weather = day['weather']
             st.write(f"**Date:** {date}")
@@ -552,7 +553,7 @@ def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport
     with col2:
         st.write("#### 🌃 Night Itinerary")
         # Display night itinerary
-        if itinerary['night']:
+        if isinstance(itinerary, dict) and itinerary.get('night'):
             for night in itinerary['night']:
                 date = night['date']
                 weather = night['weather']
@@ -587,7 +588,7 @@ def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport
             st.write("No night itinerary for this day.")
     
     st.markdown(itinerary_message, unsafe_allow_html=True)
-    
+
     col1, col2 = st.columns(2)
     with col1:
         if st.button(f"Export Itinerary {itinerary_number} as PDF 📄",  key=f"export_pdf_{set_number}_{itinerary_number}_{id(itinerary)}"):
@@ -599,6 +600,7 @@ def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport
             st.success(f"Itinerary {itinerary_number} from Set {set_number} sent via email.")
     
     return day_data
+
 
 def generate_df(all_itineraries):
     itinerary_data = []
