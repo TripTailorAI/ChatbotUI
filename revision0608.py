@@ -16,6 +16,8 @@ from reportlab.lib.pagesizes import letter, landscape
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 from io import BytesIO
 
 #COLAB
@@ -137,18 +139,25 @@ def get_weather_forecast(city):
         print(f"Response content: {response.content}")
         raise e
 
+pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf'))
+
 def create_itinerary_pdf(itinerary, set_number, itinerary_number, mode_of_transport):
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=landscape(letter), rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30)
     elements = []
+    header_color = colors.HexColor('#1C4E80')  # Deep blue
+    row_color1 = colors.HexColor('#F0F7FF')    # Very light blue
+    row_color2 = colors.HexColor('#FFFFFF')    # White
+    title_color = colors.HexColor('#0A2C4E')   # Darker blue for titles
+    border_color = colors.HexColor('#7AA5C9')  # Light blue for borders
 
     styles = getSampleStyleSheet()
-    styles.add(ParagraphStyle(name='Center', alignment=1))
-    styles.add(ParagraphStyle(name='Small', fontSize=8))
-    styles.add(ParagraphStyle(name='Thank You', fontSize=14, alignment=1, spaceAfter=12))
+    styles.add(ParagraphStyle(name='Center', alignment=1, fontName='DejaVuSans', textColor=title_color))
+    styles.add(ParagraphStyle(name='Small', fontSize=8, fontName='DejaVuSans'))
+    styles.add(ParagraphStyle(name='Thank You', fontSize=14, alignment=1, spaceAfter=12, fontName='DejaVuSans', textColor=title_color))
 
     # Add thank you message
-    elements.append(Paragraph("Thank you for using TripTailor AI!", styles['Thank You']))
+    elements.append(Paragraph("Thank you for using TripTailorAI!🙌", styles['Thank You']))
     elements.append(Spacer(1, 12))
 
     elements.append(Paragraph(f"Itinerary {itinerary_number} from Set {set_number}", styles['Heading1']))
@@ -173,24 +182,28 @@ def create_itinerary_pdf(itinerary, set_number, itinerary_number, mode_of_transp
 
         table = Table(data, colWidths=[0.5*inch, 1.8*inch, 1.5*inch, 2.5*inch, 1.5*inch, 1*inch])
         table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('BACKGROUND', (0, 0), (-1, 0), header_color),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTNAME', (0, 0), (-1, 0), 'DejaVuSans-Bold'),
             ('FONTSIZE', (0, 0), (-1, 0), 10),
             ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('BACKGROUND', (0, 1), (-1, -1), row_color1),
             ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
-            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTNAME', (0, 1), (-1, -1), 'DejaVuSans'),
             ('FONTSIZE', (0, 1), (-1, -1), 8),
             ('TOPPADDING', (0, 1), (-1, -1), 3),
             ('BOTTOMPADDING', (0, 1), (-1, -1), 3),
-            ('GRID', (0, 0), (-1, -1), 1, colors.black)
+            ('GRID', (0, 0), (-1, -1), 1, border_color),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [row_color1, row_color2])
         ]))
         elements.append(table)
         elements.append(Spacer(1, 12))
 
+    info_text = "Did you know that if you press the 'Send all itineraries' button, you'll get all of your itineraries in your email?"
+    elements.append(Paragraph(info_text, styles['Info']))
+    
     doc.build(elements)
     buffer.seek(0)
     return buffer
