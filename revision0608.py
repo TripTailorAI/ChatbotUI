@@ -542,19 +542,81 @@ def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport
     
     return day_data
 
-def generate_df(all_itineraries):
-    itinerary_data =[]
-    columns = ['itinerary_version','date','weather','time','activity','place','MapsLink','Address','Hours']
-    for i, itinerary in enumerate(all_itineraries, 1):
+def generate_df(itinerary_set):
+    itinerary_data = []
+    columns = ['itinerary_version', 'date', 'weather', 'time', 'activity', 'place', 'MapsLink', 'Address', 'Hours']
+    
+    day_itineraries = itinerary_set.get('day', [])
+    night_itineraries = itinerary_set.get('night', [])
+    
+    for i, itinerary in enumerate(day_itineraries, 1):
         for day in itinerary:
-            for j, activity in enumerate(day['activities'], 1):
-                itinerary_data.append([i,day['date'],day['weather']
-                                        ,activity['time'],activity['activity']
-                                        ,activity['place']['name'],activity['place']['url'],activity['place']['formatted_address']
-                                        ,activity['opening_hours']])
-    df = pd.DataFrame(itinerary_data)
-    df.columns = columns
+            for activity in day['activities']:
+                itinerary_data.append([
+                    f"{i} (Day)",
+                    day['date'],
+                    day['weather'],
+                    activity['time'],
+                    activity['activity'],
+                    activity['place']['name'],
+                    activity['place']['url'],
+                    activity['place']['formatted_address'],
+                    activity['opening_hours']
+                ])
+    
+    if night_itineraries:
+        for i, itinerary in enumerate(night_itineraries, 1):
+            for day in itinerary:
+                for activity in day['activities']:
+                    itinerary_data.append([
+                        f"{i} (Night)",
+                        day['date'],
+                        day['weather'],
+                        activity['time'],
+                        activity['activity'],
+                        activity['place']['name'],
+                        activity['place']['url'],
+                        activity['place']['formatted_address'],
+                        activity['opening_hours']
+                    ])
+    
+    df = pd.DataFrame(itinerary_data, columns=columns)
     return df
+
+def send_to_gsheets():
+    if st.session_state.all_generated_itineraries:
+        most_recent_set = st.session_state.all_generated_itineraries[-1]
+        df = generate_df(most_recent_set)
+        
+        service_account_info = st.secrets["gcp_service_account"]
+        
+        # Create credentials object
+        credentials = Credentials.from_service_account_info(
+            service_account_info,
+            scopes=['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
+        )
+        
+        # Authorize with pygsheets using the credentials
+        gc = pygsheets.authorize(custom_credentials=credentials)
+        
+        # Rest of your function remains the same
+        sheet_id = '1Mw_kkGf8Z5qN2RGhOzIM04zEN30cZIznrOfjWPwNluc'
+        worksheet_name = 'Base_Day'
+        sh = gc.open_by_key(sheet_id)
+        wks = sh.worksheet_by_title(worksheet_name)  # Select the first sheet
+        start_cell = 'C2'
+        end_cell = 'K500'
+        wks.clear(start=start_cell, end=end_cell)
+        wks.set_dataframe(df, (1, 3))
+        worksheet_name = 'Master'
+        wks = sh.worksheet_by_title(worksheet_name)  # Select the first sheet
+        wks.update_value("B1", email_address)
+        wks.update_value("B2", destination)
+        wks.update_value("B3", start_date.strftime("%Y-%m-%d"))
+        wks.update_value("B4", end_date.strftime("%Y-%m-%d"))
+        return True
+    else:
+        return False
 
 def send_to_gsheets():
     if st.session_state.all_generated_itineraries:
