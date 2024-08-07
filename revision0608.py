@@ -140,6 +140,7 @@ def get_weather_forecast(city):
         raise e
 
 pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf'))
+pdfmetrics.registerFont(TTFont('DejaVuSans-Bold', 'DejaVuSans-Bold.ttf'))
 
 def create_itinerary_pdf(itinerary, set_number, itinerary_number, mode_of_transport):
     buffer = BytesIO()
