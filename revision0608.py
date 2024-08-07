@@ -479,19 +479,18 @@ def create_night_itinerary(destination, country, start_date, end_date, hotel_nam
                     continue
 
                 place_details = get_place_details(f"{item['place']} in {destination}, {country}", f"{destination}, {country}")
-                
-                if place_details['opening_hours']:
-                    opening_hours = get_place_opening_hours(place_details, current_date)
-                    verified_itinerary.append({
-                        'time': item['time'],
-                        'activity': item['activity'],
-                        'place': place_details,
-                        'opening_hours': opening_hours,
-                        'time_int': item['time_int'],
-                        'approx_distance': item['approx_distance']
-                    })
-                    all_used_places.add(item['place'])  # Add to all used places
-                    used_places.add(item['place'])
+                selected_place = place_details
+                opening_hours = get_place_opening_hours(selected_place, current_date)
+                verified_itinerary.append({
+                    'time': item['time'],
+                    'activity': item['activity'],
+                    'place': place_details,
+                    'opening_hours': opening_hours,
+                    'time_int': item['time_int'],
+                    'approx_distance': item['approx_distance']
+                })
+                all_used_places.add(item['place'])  # Add to all used places
+                used_places.add(item['place'])
 
             # Only process travel times if there are activities
             if verified_itinerary:
