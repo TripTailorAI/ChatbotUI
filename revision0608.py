@@ -145,6 +145,11 @@ def create_itinerary_pdf(itinerary, set_number, itinerary_number, mode_of_transp
     styles = getSampleStyleSheet()
     styles.add(ParagraphStyle(name='Center', alignment=1))
     styles.add(ParagraphStyle(name='Small', fontSize=8))
+    styles.add(ParagraphStyle(name='Thank You', fontSize=14, alignment=1, spaceAfter=12))
+
+    # Add thank you message
+    elements.append(Paragraph("Thank you for using TripTailor AI!", styles['Thank You']))
+    elements.append(Spacer(1, 12))
 
     elements.append(Paragraph(f"Itinerary {itinerary_number} from Set {set_number}", styles['Heading1']))
     elements.append(Spacer(1, 12))
