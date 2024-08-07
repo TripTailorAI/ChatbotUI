@@ -139,13 +139,13 @@ def get_weather_forecast(city):
 
 def create_itinerary_pdf(itinerary, set_number, itinerary_number, mode_of_transport):
     buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    doc = SimpleDocTemplate(buffer, pagesize=landscape(letter), rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30)
     elements = []
 
     styles = getSampleStyleSheet()
     styles.add(ParagraphStyle(name='Center', alignment=1))
+    styles.add(ParagraphStyle(name='Small', fontSize=8))
 
-    # Title
     elements.append(Paragraph(f"Itinerary {itinerary_number} from Set {set_number}", styles['Heading1']))
     elements.append(Spacer(1, 12))
 
@@ -157,30 +157,30 @@ def create_itinerary_pdf(itinerary, set_number, itinerary_number, mode_of_transp
         data = [['Time', 'Activity', 'Place', 'Address', 'Opening Hours', 'Travel Time']]
         for i, activity in enumerate(day['activities']):
             row = [
-                activity['time'],
-                activity['activity'],
-                activity['place']['name'],
-                activity['place']['formatted_address'],
-                activity.get('opening_hours', 'N/A'),
-                activity.get('duration_to_next', 'N/A') if i < len(day['activities']) - 1 else 'N/A'
+                Paragraph(activity['time'], styles['Small']),
+                Paragraph(activity['activity'], styles['Small']),
+                Paragraph(activity['place']['name'], styles['Small']),
+                Paragraph(activity['place']['formatted_address'], styles['Small']),
+                Paragraph(activity.get('opening_hours', 'N/A'), styles['Small']),
+                Paragraph(activity.get('duration_to_next', 'N/A') if i < len(day['activities']) - 1 else 'N/A', styles['Small'])
             ]
             data.append(row)
 
-        table = Table(data, colWidths=[0.7*inch, 1.5*inch, 1.5*inch, 2*inch, 1.3*inch, 1*inch])
+        table = Table(data, colWidths=[0.5*inch, 1.8*inch, 1.5*inch, 2.5*inch, 1.5*inch, 1*inch])
         table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 14),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),
             ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
             ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
             ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 1), (-1, -1), 12),
-            ('TOPPADDING', (0, 1), (-1, -1), 6),
-            ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
+            ('FONTSIZE', (0, 1), (-1, -1), 8),
+            ('TOPPADDING', (0, 1), (-1, -1), 3),
+            ('BOTTOMPADDING', (0, 1), (-1, -1), 3),
             ('GRID', (0, 0), (-1, -1), 1, colors.black)
         ]))
         elements.append(table)
