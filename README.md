@@ -11,6 +11,7 @@ VoyagerAI is an intelligent travel itinerary generator that creates personalized
 - 📅 Multi-day trip planning
 - 🔎 Integration with Google Places API for accurate location data
 - 📧 Export itineraries as PDF or send via email
+- NO APP Downloads needed
 
 ## Getting Started
 
