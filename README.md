@@ -7,7 +7,7 @@ VoyagerAI is an intelligent travel itinerary generator that creates personalized
 - 🗺️ Generate detailed travel itineraries for any destination
 - 🌤️ Incorporate real-time weather forecasts
 - 🕒 Suggest activities with opening hours and travel times
-- 🚗 Support for multiple transportation modes
+- 🚗 Support for multiple transportation modes (Public Transport, Driving, etc.)
 - 📅 Multi-day trip planning
 - 🔎 Integration with Google Places API for accurate location data
 - 📧 Export itineraries as PDF or send via email
@@ -45,3 +45,7 @@ Contributions to VoyagerAI are welcome! Please feel free to submit a Pull Reques
 - Google Generative AI
 - Streamlit for the web application framework
 
+## Future Roadmaps
+- Multi City Trip generation
+- What do you need to pack for your trip (based on weather etc.)
+- Travel Pack Rental for your itinerary
