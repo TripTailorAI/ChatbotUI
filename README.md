@@ -1,6 +1,6 @@
-# VoyagerAI 🌎
+# TripTailorAI 🌎
 
-VoyagerAI is an intelligent travel itinerary generator that creates personalized trip plans based on user preferences and real-time data.
+TripTailorAI is an intelligent travel itinerary generator that creates personalized trip plans based on user preferences and real-time data.
 
 ## Features
 
@@ -11,7 +11,7 @@ VoyagerAI is an intelligent travel itinerary generator that creates personalized
 - 📅 Multi-day trip planning
 - 🔎 Integration with Google Places API for accurate location data
 - 📧 Export itineraries as PDF or send via email
-- NO APP Downloads needed
+- 🌐 NO APP Downloads needed
 
 ## Getting Started
 
@@ -37,7 +37,7 @@ VoyagerAI is an intelligent travel itinerary generator that creates personalized
 
 ## Contributing
 
-Contributions to VoyagerAI are welcome! Please feel free to submit a Pull Request.
+Contributions to TripTailorAI are welcome! Please feel free to submit a Pull Request.
 
 ## Acknowledgments
 
