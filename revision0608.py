@@ -57,15 +57,8 @@ if 'generate_nightlife' not in st.session_state:
     st.session_state.generate_nightlife = False
 
 if 'email_address' not in st.session_state:
-    st.session_state.email_address = "Enter your email address here"
+    st.session_state.email_address = ""
 
-if 'email_clicked' not in st.session_state:
-    st.session_state.email_clicked = False
-
-def clear_email():
-    if not st.session_state.email_clicked:
-        st.session_state.email_address = ""
-        st.session_state.email_clicked = True
 
 # List of all countries
 countries = sorted([country.name for country in pycountry.countries])
@@ -785,7 +778,6 @@ email_address = st.sidebar.text_input(
     "📧 Email Address",
     value=st.session_state.email_address,
     key="email_input",
-    on_change=clear_email
 )
 st.session_state.email_address = email_address
 country = st.sidebar.selectbox("🏳️ Country", countries)
