@@ -902,7 +902,7 @@ if st.session_state.all_generated_itineraries:
     if len(st.session_state.all_generated_itineraries) > 1:
         st.write("## Previously Generated Itineraries")
         for set_number, itinerary_set in reversed(list(enumerate(st.session_state.all_generated_itineraries[:-1], 1))):
-            trip_details = itinerary_set.get(['trip_details'])
+            trip_details = itinerary_set.get('trip_details')
             st.write(f"#### Trip Destination: {trip_details['destination']}, {trip_details['country']}")
             st.write(f"#### Date: {trip_details['start_date']} - {trip_details['end_date']}")
         
