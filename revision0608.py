@@ -628,7 +628,7 @@ def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport
     with col2:
         if st.button(f"Send Itinerary {itinerary_number} via Email 📧", key=f"send_email_{set_number}_{itinerary_number}_{id(itinerary)}"):
             send_to_gsheets()
-            send_email([itinerary_number])
+            send_email(['V'+itinerary_number])
             st.success(f"Itinerary {itinerary_number} from Set {set_number} sent via email.")
     
     return day_data
