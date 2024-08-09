@@ -894,6 +894,7 @@ if st.session_state.all_generated_itineraries:
         st.write("## Previously Generated Itineraries")
         for set_number, itinerary_set in reversed(list(enumerate(st.session_state.all_generated_itineraries[:-1], 1))):
             st.write(f"#### Trip Destination: {destination}, {start_date}  -  {end_date}")
+            st.write(st.session_state.all_generated_itineraries)
             if isinstance(itinerary_set, dict):
                 day_itineraries = itinerary_set.get('day', [])
                 night_itineraries = itinerary_set.get('night') if st.session_state.generate_nightlife else None
