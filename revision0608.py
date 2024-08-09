@@ -948,7 +948,7 @@ if st.session_state.all_generated_itineraries:
         "content": f"Generated {len(st.session_state.all_generated_itineraries)} set(s) of itineraries for {destination}, {country}. Total itineraries: {total_itineraries}."
     })
 
-    if st.sidebar.button("📥Export All Itineraries", key="export_all_itineraries"):
+    if st.sidebar.button("Email All Itineraries", key="export_all_itineraries"):
         if send_to_gsheets():
             arguments = ['V1','V2','V3']
             send_email(arguments)
