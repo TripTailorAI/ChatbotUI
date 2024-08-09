@@ -785,7 +785,7 @@ email_address = st.sidebar.text_input(
     "📧 Email Address",
     value=st.session_state.email_address,
     key="email_input",
-    on_click=clear_email
+    on_change=clear_email
 )
 st.session_state.email_address = email_address
 country = st.sidebar.selectbox("🏳️ Country", countries)
