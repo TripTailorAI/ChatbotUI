@@ -936,7 +936,7 @@ if st.session_state.all_generated_itineraries:
 
     if st.sidebar.button("📥Export All Itineraries", key="export_all_itineraries"):
         if send_to_gsheets():
-            send_email([itinerary_number])
+            send_email()
             st.sidebar.success("Most recent itinerary set exported successfully!")
         else:
             st.sidebar.error("No itineraries to export. Please generate an itinerary first.")
