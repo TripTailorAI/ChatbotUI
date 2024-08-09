@@ -842,7 +842,7 @@ if st.sidebar.button("✍ Generate Itineraries"):
             st.session_state.itinerary_set_count += 1
             end_time = time.time()  # Stop the timer
             elapsed_time = end_time - start_time  # Calculate elapsed time
-            st.markdown(elapsed_time)
+            #st.markdown(elapsed_time)
             st.success(f"Itinerary set {st.session_state.itinerary_set_count} generated successfully!")
         except Exception as e:
             st.sidebar.error(f"An error occurred while creating the itinerary: {str(e)}")
