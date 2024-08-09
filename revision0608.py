@@ -836,6 +836,15 @@ if st.sidebar.button("✍ Generate Itineraries"):
                 )
             
             st.session_state.all_generated_itineraries.append({
+                'trip_details': {
+                    'destination': destination,
+                    'country': country,
+                    'start_date': start_date.strftime("%Y-%m-%d"),
+                    'end_date': end_date.strftime("%Y-%m-%d"),
+                    'hotel_name': hotel_name,
+                    'purpose_of_stay': purpose_of_stay,
+                    'mode_of_transport': mode_of_transport,
+                },
                 'day': new_day_itineraries,
                 'night': new_night_itineraries
             })
@@ -893,8 +902,10 @@ if st.session_state.all_generated_itineraries:
     if len(st.session_state.all_generated_itineraries) > 1:
         st.write("## Previously Generated Itineraries")
         for set_number, itinerary_set in reversed(list(enumerate(st.session_state.all_generated_itineraries[:-1], 1))):
-            st.write(f"#### Trip Destination: {destination}, {start_date}  -  {end_date}")
-            st.write(st.session_state.all_generated_itineraries)
+            trip_details = itinerary_set['trip_details']
+            st.write(f"#### Trip Destination: {trip_details['destination']}, {trip_details['country']}")
+            st.write(f"#### Date: {trip_details['start_date']} - {trip_details['end_date']}")
+        
             if isinstance(itinerary_set, dict):
                 day_itineraries = itinerary_set.get('day', [])
                 night_itineraries = itinerary_set.get('night') if st.session_state.generate_nightlife else None
