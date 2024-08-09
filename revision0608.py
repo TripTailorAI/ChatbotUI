@@ -81,7 +81,7 @@ def get_place_details(query, location, radius=5000, min_rating=2.5, min_reviews=
         "formatted_address": f"{query.split(' in ')[1]}",
         "rating": "N/A",
         "user_ratings_total": "N/A",
-        "url": "#"  # Add a default URL
+        "url": "http://maps.google.com/?q="+str(gquery.split(" in ")[0])  # Add a default URL
     }
 
     if not places:
