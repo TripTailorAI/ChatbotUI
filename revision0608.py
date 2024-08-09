@@ -628,6 +628,7 @@ def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport
     with col2:
         if st.button(f"Send Itinerary {itinerary_number} via Email 📧", key=f"send_email_{set_number}_{itinerary_number}_{id(itinerary)}"):
             send_to_gsheets()
+            send_email([itinerary_number])
             st.success(f"Itinerary {itinerary_number} from Set {set_number} sent via email.")
     
     return day_data
@@ -742,7 +743,26 @@ def send_to_gsheets():
         return True
     else:
         return False
+
+from google.oauth2 import service_account
+import google.auth.transport.requests
+import requests
+import json
+
+def getAccessToken():
+        SERVICE_ACCOUNT_FILE = "sheets-drive-api-1-7785bd353bca.json" # Please set your value.
+        creds = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=["https://www.googleapis.com/auth/drive.readonly"])
+        creds.refresh(google.auth.transport.requests.Request())
+        return creds.token
     
+def send_email(arguments):
+    functionName = "maincall"
+    webApps_url = 'https://script.google.com/macros/s/AKfycbxL1kUB-TaP6oFEpZgFzAUhOvtHm6bnDgaPpcNZ-xA/dev'
+    access_token = getAccessToken()
+    url = f'{webApps_url}?functionName={functionName}'
+    res = requests.post(url, json.dumps(arguments), headers={"Authorization": "Bearer " + access_token})
+    print(res.text)
+
 # Streamlit app
 st.title("TripTailorAI🌎")
 # Short instructions
@@ -916,6 +936,7 @@ if st.session_state.all_generated_itineraries:
 
     if st.sidebar.button("📥Export All Itineraries", key="export_all_itineraries"):
         if send_to_gsheets():
+            send_email([itinerary_number])
             st.sidebar.success("Most recent itinerary set exported successfully!")
         else:
             st.sidebar.error("No itineraries to export. Please generate an itinerary first.")
