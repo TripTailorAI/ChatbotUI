@@ -750,8 +750,10 @@ import requests
 import json
 
 def getAccessToken():
-        SERVICE_ACCOUNT_FILE = "sheets-drive-api-1-7785bd353bca.json" # Please set your value.
-        creds = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=["https://www.googleapis.com/auth/drive.readonly"])
+        service_account_email = st.secrets["gcp_service_email"]
+        # SERVICE_ACCOUNT_FILE = "sheets-drive-api-1-7785bd353bca.json" # Please set your value.
+        # creds = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=["https://www.googleapis.com/auth/drive.readonly"])
+        creds = Credentials.from_service_account_info(service_account_email,scopes=["https://www.googleapis.com/auth/drive.readonly"])
         creds.refresh(google.auth.transport.requests.Request())
         return creds.token
     
