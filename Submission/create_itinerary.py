@@ -1,6 +1,6 @@
 import streamlit as st
 from place_weather import get_place_details, get_weather_forecast
-from get_itinerary import get_daily_itinerary, get_nightlife_itinerary
+from get_itinerary import get_daily_itinerary, get_nightlife_itinerary, is_place_in_location, get_place_opening_hours
 from output import create_itinerary_pdf, display_itinerary, generate_df, send_to_gsheets, getAccessToken, send_email
 import pandas as pd
 
