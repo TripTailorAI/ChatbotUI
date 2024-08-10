@@ -129,6 +129,7 @@ def streamlit_page():
 
 
     if st.sidebar.button("✍ Generate Itineraries"):
+        @st.cache(show_spinner=False)
         with st.spinner("Generating itinerary, please wait..."):
             try:
                 start_time = time.time()

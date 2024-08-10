@@ -385,7 +385,7 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
 
             if daily_itinerary is None:
                 # print(f"Error: Failed to get itinerary from GeminiAI for {current_date}")
-                print(f"Skipping this day in the itinerary.")
+                # print(f"Skipping this day in the itinerary.")
                 continue
 
             verified_itinerary = []
