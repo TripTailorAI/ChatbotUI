@@ -45,4 +45,3 @@ def streamlit_pageconfig():
         st.session_state.custom_preferences = ""
 
     # List of all countries
-    countries = sorted([country.name for country in pycountry.countries])

@@ -1,4 +1,7 @@
 import streamlit as st
+import pycountry
+
+countries = sorted([country.name for country in pycountry.countries])
 @st.cache_data(ttl=3600)
 def streamlit_page():
     # Streamlit app
