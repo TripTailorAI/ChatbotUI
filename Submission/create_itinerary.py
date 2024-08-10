@@ -5,7 +5,7 @@ from output import create_itinerary_pdf, display_itinerary, generate_df, send_to
 import time
 import pandas as pd
 GOOGLE_API_KEY = st.secrets['GOOGLE_API_KEY']
-genai.configure(api_key=GOOGLE_API_KEY)
+# genai.configure(api_key=GOOGLE_API_KEY)
 google_places_api_key = st.secrets['MAPS_API_KEY']
 weather_api_key = st.secrets['WEATHER']
 
