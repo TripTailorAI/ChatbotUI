@@ -7,6 +7,7 @@ import pandas as pd
 from google.oauth2.service_account import Credentials
 from google.oauth2 import service_account
 import google.auth.transport.requests
+import requests
 
 GOOGLE_API_KEY = st.secrets['GOOGLE_API_KEY']
 # genai.configure(api_key=GOOGLE_API_KEY)
