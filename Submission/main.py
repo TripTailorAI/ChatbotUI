@@ -37,8 +37,9 @@ weather_api_key = st.secrets['WEATHER']
 pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf'))
 pdfmetrics.registerFont(TTFont('DejaVuSans-Bold', 'DejaVuSans-Bold.ttf'))
 
+streamlit_pageconfig()
+streamlit_page()
+@st.cache_data(ttl=3600)
+
 if name == "main":
-    streamlit_pageconfig()
-    streamlit_page()
-    @st.cache_data(ttl=3600)
-    main() 
+    main()
