@@ -4,6 +4,10 @@ from get_itinerary import get_daily_itinerary, get_nightlife_itinerary, is_place
 from output import create_itinerary_pdf, display_itinerary, generate_df, send_to_gsheets, getAccessToken, send_email
 import time
 import pandas as pd
+from google.oauth2.service_account import Credentials
+from google.oauth2 import service_account
+import google.auth.transport.requests
+
 GOOGLE_API_KEY = st.secrets['GOOGLE_API_KEY']
 # genai.configure(api_key=GOOGLE_API_KEY)
 google_places_api_key = st.secrets['MAPS_API_KEY']
