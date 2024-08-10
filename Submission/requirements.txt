@@ -1,0 +1,6 @@
+google-generativeai
+googlemaps
+streamlit
+pycountry
+pygsheets
+reportlab
