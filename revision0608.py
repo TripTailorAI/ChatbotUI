@@ -102,7 +102,7 @@ def get_place_details(query, location, radius=5000, min_rating=2.5, min_reviews=
         "formatted_address": f"{query.split(' in ')[1]}",
         "rating": "N/A",
         "user_ratings_total": "N/A",
-        "url": "http://maps.google.com/?q="+str(query.split(" in ")[0])  # Add a default URL
+        "url": "https://maps.google.com/?q="+str(query.split(" in ")[0])  # Add a default URL
     }
 
     if not places:
@@ -612,7 +612,7 @@ def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport
             address = activity['place']['formatted_address']
             opening_hours = activity.get('opening_hours', 'N/A')
             
-            itinerary_message += f"- {time}: {activity_name} at [{place_name}]({activity['place'].get('url', '#')})\n"
+            itinerary_message += f"- {time}: {activity_name} at [{place_name}]({activity['place'].get('url','#')})\n"
             itinerary_message += f"  - Address: {address}\n"
             itinerary_message += f"  - Opening Hours: {opening_hours}\n"
             if i < len(day['activities']) - 1:
