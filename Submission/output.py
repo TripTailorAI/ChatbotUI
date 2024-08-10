@@ -1,5 +1,8 @@
 import streamlit as st
 import pandas as pd
+from google.oauth2.service_account import Credentials
+from google.oauth2 import service_account
+import google.auth.transport.requests
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
