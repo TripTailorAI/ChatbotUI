@@ -3,7 +3,7 @@ import pycountry
 from datetime import datetime, timedelta, date
 import traceback
 from io import BytesIO
-# from place_weather import get_place_details, get_weather_forecast
+from place_weather import get_place_details, get_weather_forecast
 from get_itinerary import get_daily_itinerary, get_nightlife_itinerary
 from output import create_itinerary_pdf, display_itinerary, generate_df, send_to_gsheets, getAccessToken, send_email
 from create_itinerary import create_travel_itinerary, create_night_itinerary

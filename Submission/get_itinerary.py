@@ -1,4 +1,4 @@
-from streamlit_page import streamlit_page, streamlit_pageconfig
+# from streamlit_page import streamlit_page, streamlit_pageconfig
 # from streamlit_config import streamlit_pageconfig
 import streamlit as st
 import requests
