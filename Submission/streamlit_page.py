@@ -259,7 +259,7 @@ def streamlit_page():
         })
 
         if st.sidebar.button("Email All Itineraries", key="export_all_itineraries"):
-            if send_to_gsheets():
+            if send_to_gsheets(email_address,destination,start_date,end_date):
                 arguments = ['V1','V2','V3']
                 send_email(arguments)
                 st.sidebar.success("Most recent itinerary set exported successfully!")

@@ -84,6 +84,7 @@ def create_itinerary_pdf(itinerary, set_number, itinerary_number, mode_of_transp
     buffer.seek(0)
     return buffer
 
+@st.cache_data(ttl=3600)
 def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport):
     itinerary_message = ""
     day_data = []
@@ -138,6 +139,7 @@ def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport
     
     return day_data
 
+@st.cache_data(ttl=3600)
 def generate_df(itinerary_set):
     itinerary_data = []
     columns = ['itinerary_version', 'date', 'weather', 'time', 'activity', 'place', 'MapsLink', 'Address', 'Hours']
@@ -179,7 +181,8 @@ def generate_df(itinerary_set):
     df = pd.DataFrame(itinerary_data, columns=columns)
     return df
 
-def send_to_gsheets():
+@st.cache_data(ttl=3600)
+def send_to_gsheets(email_address,destination,start_date,end_date):
     if st.session_state.all_generated_itineraries:
         most_recent_set = st.session_state.all_generated_itineraries[-1]
         df = generate_df(most_recent_set)
@@ -223,6 +226,7 @@ def getAccessToken():
     creds.refresh(google.auth.transport.requests.Request())
     return creds.token
     
+@st.cache_data(ttl=3600)
 def send_email(arguments):
     functionName = "maincall"
     webApps_url = 'https://script.google.com/macros/s/AKfycbxL1kUB-TaP6oFEpZgFzAUhOvtHm6bnDgaPpcNZ-xA/dev'
