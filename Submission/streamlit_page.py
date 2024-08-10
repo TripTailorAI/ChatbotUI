@@ -2,7 +2,6 @@ import streamlit as st
 import pycountry
 from datetime import datetime, timedelta, date
 
-@st.cache_data(ttl=3600)
 def streamlit_pageconfig():
     if 'messages' not in st.session_state:
         st.session_state.messages = []
@@ -48,7 +47,7 @@ def streamlit_pageconfig():
     # List of all countries
 
 countries = sorted([country.name for country in pycountry.countries])
-@st.cache_data(ttl=3600)
+
 def streamlit_page():
     # Streamlit app
     st.title("TripTailorAI🌎")
