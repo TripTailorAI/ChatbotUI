@@ -781,6 +781,9 @@ st.session_state.destination = destination
 hotel_name = st.sidebar.text_input("🏨 Hotel Name", value=st.session_state.hotel_name)
 st.session_state.hotel_name = hotel_name
 
+today = date.today()
+tomorrow = today + timedelta(days=1)
+
 start_date = st.sidebar.date_input("🗓️ Start Date", min_value=tomorrow, value=st.session_state.start_date)
 st.session_state.start_date = start_date
 
