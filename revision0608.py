@@ -9,8 +9,9 @@ import traceback
 import time
 import pycountry
 import pygsheets
-import json
 from google.oauth2.service_account import Credentials
+from google.oauth2 import service_account
+import google.auth.transport.requests
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
@@ -19,6 +20,7 @@ from reportlab.lib.units import inch
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from io import BytesIO
+
 
 #COLAB
 # from google.colab import userdata
@@ -59,7 +61,31 @@ if 'generate_nightlife' not in st.session_state:
 if 'email_address' not in st.session_state:
     st.session_state.email_address = ""
 
-
+if 'country' not in st.session_state:
+    st.session_state.country = ""
+if 'destination' not in st.session_state:
+    st.session_state.destination = ""
+    
+if 'hotel_name' not in st.session_state:
+    st.session_state.hotel_name = ""
+    
+if 'start_date' not in st.session_state:
+    st.session_state.start_date = date.today() + timedelta(days=1)
+    
+if 'end_date' not in st.session_state:
+    st.session_state.end_date = date.today() + timedelta(days=1)
+    
+if 'purpose_of_stay' not in st.session_state:
+    st.session_state.purpose_of_stay = "Vacation"
+    
+if 'mode_of_transport' not in st.session_state:
+    st.session_state.mode_of_transport = "🚗 Driving"
+    
+if 'custom_preferences' not in st.session_state:
+    st.session_state.custom_preferences = ""
+    
+if 'generate_nightlife' not in st.session_state:
+    st.session_state.generate_nightlife = False
 # List of all countries
 countries = sorted([country.name for country in pycountry.countries])
 
@@ -702,45 +728,6 @@ def send_to_gsheets():
     else:
         return False
 
-def send_to_gsheets():
-    if st.session_state.all_generated_itineraries:
-        most_recent_set = st.session_state.all_generated_itineraries[-1]
-        df = generate_df(most_recent_set)
-        
-        service_account_info = st.secrets["gcp_service_account"]
-        
-        # Create credentials object
-        credentials = Credentials.from_service_account_info(
-            service_account_info,
-            scopes=['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
-        )
-        
-        # Authorize with pygsheets using the credentials
-        gc = pygsheets.authorize(custom_credentials=credentials)
-        
-        # Rest of your function remains the same
-        sheet_id = '1Mw_kkGf8Z5qN2RGhOzIM04zEN30cZIznrOfjWPwNluc'
-        worksheet_name = 'Base_Day'
-        sh = gc.open_by_key(sheet_id)
-        wks = sh.worksheet_by_title(worksheet_name)  # Select the first sheet
-        start_cell = 'C2'
-        end_cell = 'K500'
-        wks.clear(start=start_cell, end=end_cell)
-        wks.set_dataframe(df, (1, 3))
-        worksheet_name = 'Master'
-        wks = sh.worksheet_by_title(worksheet_name)  # Select the first sheet
-        wks.update_value("B1", email_address)
-        wks.update_value("B2", destination)
-        wks.update_value("B3", start_date.strftime("%Y-%m-%d"))
-        wks.update_value("B4", end_date.strftime("%Y-%m-%d"))
-        return True
-    else:
-        return False
-
-from google.oauth2 import service_account
-import google.auth.transport.requests
-import requests
-import json
 
 def getAccessToken():
         service_account_email = st.secrets["gcp_service_email"]
@@ -780,14 +767,25 @@ email_address = st.sidebar.text_input(
     key="email_input",
 )
 st.session_state.email_address = email_address
-country = st.sidebar.selectbox("🏳️ Country", countries)
-destination = st.sidebar.text_input("🏙️ Destination", "")
-hotel_name = st.sidebar.text_input("🏨 Hotel Name", "")
-today = date.today()
-tomorrow = today + timedelta(days=1)
-start_date = st.sidebar.date_input("🗓️ Start Date", min_value=tomorrow, value=tomorrow)
-end_date = st.sidebar.date_input("🗓️ End Date", min_value=tomorrow, value=tomorrow)
-purpose_of_stay = st.sidebar.selectbox("🎯 Purpose of Stay", ["Vacation", "Business"])
+
+country = st.sidebar.selectbox("🏳️ Country", countries, index=countries.index(st.session_state.country) if st.session_state.country in countries else 0)
+st.session_state.country = country
+
+destination = st.sidebar.text_input("🏙️ Destination", value=st.session_state.destination)
+st.session_state.destination = destination
+
+hotel_name = st.sidebar.text_input("🏨 Hotel Name", value=st.session_state.hotel_name)
+st.session_state.hotel_name = hotel_name
+
+start_date = st.sidebar.date_input("🗓️ Start Date", min_value=tomorrow, value=st.session_state.start_date)
+st.session_state.start_date = start_date
+
+end_date = st.sidebar.date_input("🗓️ End Date", min_value=tomorrow, value=st.session_state.end_date)
+st.session_state.end_date = end_date
+
+purpose_of_stay = st.sidebar.selectbox("🎯 Purpose of Stay", ["Vacation", "Business"], index=["Vacation", "Business"].index(st.session_state.purpose_of_stay))
+st.session_state.purpose_of_stay = purpose_of_stay
+
 transport_modes = {
     "🚗 Driving": "driving",
     "🚶 Walking": "walking",
@@ -795,6 +793,7 @@ transport_modes = {
     "🚊 Transit": "transit"
 }
 mode_of_transport = st.sidebar.selectbox("🚀 Mode of Transportation", list(transport_modes.keys()))
+st.session_state.mode_of_transport = mode_of_transport
 mode_of_transport_value = transport_modes[mode_of_transport]
 
 custom_preferences = st.sidebar.text_input("✨ Custom Preferences", 
@@ -802,8 +801,8 @@ custom_preferences = st.sidebar.text_input("✨ Custom Preferences",
     key="custom_pref_input",
     help="Enter any special requirements or preferences for your trip here.")
 
+st.session_state.custom_preferences = custom_preferences
 
-# With these lines
 st.session_state.generate_nightlife = st.sidebar.checkbox("🌙 Generate Nightlife Itinerary", value=st.session_state.generate_nightlife)
 
 
