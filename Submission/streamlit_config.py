@@ -44,5 +44,3 @@ def streamlit_pageconfig():
 
     # List of all countries
     countries = sorted([country.name for country in pycountry.countries])
-
-    @st.cache_data(ttl=3600)
