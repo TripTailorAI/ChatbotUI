@@ -84,8 +84,8 @@ def create_itinerary_pdf(itinerary, set_number, itinerary_number, mode_of_transp
     buffer.seek(0)
     return buffer
 
-@st.cache_data(ttl=3600)
-def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport):
+# @st.cache_data(ttl=3600)
+def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport,email_address):
     itinerary_message = ""
     day_data = []
     for day in itinerary:

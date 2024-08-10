@@ -199,13 +199,13 @@ def streamlit_page():
                         st.write("#### 🌃 Night Itinerary ")
                         if night_itineraries and itinerary_number <= len(night_itineraries):
                             night_itinerary = night_itineraries[itinerary_number - 1]
-                            night_data = display_itinerary(night_itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport)
+                            night_data = display_itinerary(night_itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport,email_address)
                             table_data.extend(night_data)
                         else:
                             st.write("No nightlife itinerary for this day.")
                 else:
                     st.write("#### Day Itinerary")
-                    day_data = display_itinerary(day_itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport)
+                    day_data = display_itinerary(day_itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport,email_address)
                     table_data.extend(day_data)
 
         # Display all previously generated itinerary sets in reverse order
@@ -230,20 +230,20 @@ def streamlit_page():
                             
                             with col1:
                                 st.write("#### Day Itinerary")
-                                day_data = display_itinerary(day_itinerary, set_number, itinerary_number, mode_of_transport)
+                                day_data = display_itinerary(day_itinerary, set_number, itinerary_number, mode_of_transport,email_address)
                                 table_data.extend(day_data)
                             
                             with col2:
                                 st.write("#### Night Itinerary")
                                 if night_itineraries and itinerary_number <= len(night_itineraries):
                                     night_itinerary = night_itineraries[itinerary_number - 1]
-                                    night_data = display_itinerary(night_itinerary, set_number, itinerary_number, mode_of_transport)
+                                    night_data = display_itinerary(night_itinerary, set_number, itinerary_number, mode_of_transport,email_address)
                                     table_data.extend(night_data)
                                 else:
                                     st.write("No nightlife itinerary for this day.")
                         else:
                             st.write("#### Day Itinerary")
-                            day_data = display_itinerary(day_itinerary, set_number, itinerary_number, mode_of_transport)
+                            day_data = display_itinerary(day_itinerary, set_number, itinerary_number, mode_of_transport,email_address)
                             table_data.extend(day_data)
 
         # Create the DataFrame
