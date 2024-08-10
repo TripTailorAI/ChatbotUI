@@ -1,4 +1,9 @@
 import streamlit as st
+GOOGLE_API_KEY = st.secrets['GOOGLE_API_KEY']
+genai.configure(api_key=GOOGLE_API_KEY)
+google_places_api_key = st.secrets['MAPS_API_KEY']
+weather_api_key = st.secrets['WEATHER']
+
 @st.cache_data(ttl=3600)
 def get_daily_itinerary(destination, country, date, hotel_name, purpose_of_stay, weather_forecast, day_number, trip_length, used_places, mode_of_transport, custom_preferences):
     used_places_str = ", ".join(used_places)

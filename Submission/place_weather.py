@@ -1,5 +1,10 @@
 import streamlit as st
 @st.cache_data(ttl=3600)
+GOOGLE_API_KEY = st.secrets['GOOGLE_API_KEY']
+genai.configure(api_key=GOOGLE_API_KEY)
+google_places_api_key = st.secrets['MAPS_API_KEY']
+weather_api_key = st.secrets['WEATHER']
+
 def get_place_details(query, location, radius=5000, min_rating=2.5, min_reviews=5):
     url = "https://maps.googleapis.com/maps/api/place/textsearch/json"
     params = {
