@@ -1,18 +1,33 @@
 import streamlit as st
-from place_weather import get_place_details, get_weather_forecast
-from get_itinerary import get_daily_itinerary, get_nightlife_itinerary, is_place_in_location, get_place_opening_hours
-from output import create_itinerary_pdf, display_itinerary, generate_df, send_to_gsheets, getAccessToken, send_email
-import time
+import requests
+import json
 import pandas as pd
+import random
+import google.generativeai as genai
+from datetime import datetime, timedelta, date
+import traceback
+import time
+import pycountry
+import pygsheets
 from google.oauth2.service_account import Credentials
 from google.oauth2 import service_account
 import google.auth.transport.requests
-import requests
-
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter, landscape
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from io import BytesIO
 GOOGLE_API_KEY = st.secrets['GOOGLE_API_KEY']
-# genai.configure(api_key=GOOGLE_API_KEY)
+genai.configure(api_key=GOOGLE_API_KEY)
 google_places_api_key = st.secrets['MAPS_API_KEY']
 weather_api_key = st.secrets['WEATHER']
+
+from place_weather import get_place_details, get_weather_forecast
+from get_itinerary import get_daily_itinerary, get_nightlife_itinerary, is_place_in_location, get_place_opening_hours
+from output import create_itinerary_pdf, display_itinerary, generate_df, send_to_gsheets, getAccessToken, send_email
 
 @st.cache_data(ttl=3600)
 def create_travel_itinerary(destination, country, start_date, end_date, hotel_name, purpose_of_stay, mode_of_transport, custom_preferences):
