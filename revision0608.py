@@ -55,8 +55,6 @@ if 'itinerary_set_count' not in st.session_state:
 if 'custom_preferences' not in st.session_state:
     st.session_state.custom_preferences = ""
 
-if 'generate_nightlife' not in st.session_state:
-    st.session_state.generate_nightlife = False
 
 if 'email_address' not in st.session_state:
     st.session_state.email_address = ""
