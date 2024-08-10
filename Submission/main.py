@@ -39,4 +39,5 @@ streamlit_pageconfig()
 @st.cache_data(ttl=3600)
 streamlit_page()
 
-if name == "main": main() 
+if name == "main":
+    main() 
