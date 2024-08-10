@@ -163,12 +163,11 @@ def streamlit_page():
                 st.sidebar.error(f"Exception type: {type(e)}")
                 st.sidebar.error(f"Exception traceback: {traceback.format_exc()}")
 
+
     if st.session_state.all_generated_itineraries:
         st.subheader("TripTailorAI's Response")
-        
         # Create the table data
-        table_data = []
-        
+        table_data = []        
         # Display the most recently generated itinerary set
         most_recent_set = st.session_state.all_generated_itineraries[-1]
         st.write("## Most Recent Itineraries")
