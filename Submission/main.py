@@ -1,4 +1,5 @@
-from streamlit_page import streamlit_pageconfig
+from streamlit_page import streamlit_page
+from streamlit_config import streamlit_pageconfig
 streamlit_pageconfig()
 import streamlit as st
 import requests
@@ -22,7 +23,6 @@ from reportlab.lib.units import inch
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from io import BytesIO
-from streamlit_config import streamlit_pageconfig
 from place_weather import get_place_details, get_weather_forecast
 from get_itinerary import get_daily_itinerary, get_nightlife_itinerary
 from output import create_itinerary_pdf, display_itinerary, generate_df, send_to_gsheets, getAccessToken, send_email
