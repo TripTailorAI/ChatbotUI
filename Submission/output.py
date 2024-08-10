@@ -1,3 +1,4 @@
+import streamlit as st
 @st.cache_data(ttl=3600)
 def create_itinerary_pdf(itinerary, set_number, itinerary_number, mode_of_transport):
     buffer = BytesIO()

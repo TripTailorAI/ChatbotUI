@@ -1,3 +1,4 @@
+import streamlit as st
 @st.cache_data(ttl=3600)
 def get_place_details(query, location, radius=5000, min_rating=2.5, min_reviews=5):
     url = "https://maps.googleapis.com/maps/api/place/textsearch/json"

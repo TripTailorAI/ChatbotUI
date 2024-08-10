@@ -1,3 +1,4 @@
+import streamlit as st
 @st.cache_data(ttl=3600)
 def create_travel_itinerary(destination, country, start_date, end_date, hotel_name, purpose_of_stay, mode_of_transport, custom_preferences):
     weather_forecast_data = get_weather_forecast(destination)

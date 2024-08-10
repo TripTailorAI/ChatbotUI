@@ -1,3 +1,4 @@
+import streamlit as st
 @st.cache_data(ttl=3600)
 def streamlit_page():
     # Streamlit app
