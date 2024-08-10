@@ -55,7 +55,6 @@ if 'itinerary_set_count' not in st.session_state:
 if 'custom_preferences' not in st.session_state:
     st.session_state.custom_preferences = ""
 
-
 if 'email_address' not in st.session_state:
     st.session_state.email_address = ""
 
@@ -81,9 +80,7 @@ if 'mode_of_transport' not in st.session_state:
     
 if 'custom_preferences' not in st.session_state:
     st.session_state.custom_preferences = ""
-    
-if 'generate_nightlife' not in st.session_state:
-    st.session_state.generate_nightlife = False
+
 # List of all countries
 countries = sorted([country.name for country in pycountry.countries])
 
