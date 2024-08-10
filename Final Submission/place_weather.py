@@ -52,3 +52,15 @@ def get_place_details(query, location, radius=5000, min_rating=2.5, min_reviews=
             details[key] = default_place[key]
 
     return details
+
+def get_weather_forecast(city):
+    url = f"https://api.weatherapi.com/v1/forecast.json?key={weather_api_key}&q={city}&days=14"
+    response = requests.get(url)
+
+    try:
+        return response.json()
+    except requests.exceptions.JSONDecodeError as e:
+        print(f"Error decoding JSON response from weather API for city: {city}")
+        print(f"Response status code: {response.status_code}")
+        print(f"Response content: {response.content}")
+        raise e
