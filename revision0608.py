@@ -252,6 +252,10 @@ def get_daily_itinerary(destination, country, date, hotel_name, purpose_of_stay,
     7. Take into account the custom preferences provided by the user.
     8. End the itinerary with going back to the place the person is staying at.
     9. The person will always be staying at the hotel that is within the same city of destination. If you cannot find a hotel by that name in the same city, assume that the person is staying somewhere within the city centre main station.
+    10. Aim for a diverse range of activities across the entire trip. If a specific activity or cuisine is requested in custom preferences, include it once or twice during the trip, not every day.
+    11. Consider the length of the trip when distributing activities. For longer trips, space out similar activities.
+    12. If a specific food or cuisine is mentioned in the custom preferences, suggest it for one meal, but vary other meal suggestions.
+    13. For multi-day trips, try to group activities by area each day to minimize travel time.
 
     Format the output as a JSON object with each entry containing:
     - time: suggested time for the activity on date: {date} in the local timezone of the place (for example 09:00)
