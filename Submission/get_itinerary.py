@@ -154,6 +154,8 @@ def is_place_in_location(place, destination, country):
                 for component in place.get('address_components', [])))
 
 @st.cache_data(ttl=3600,show_spinner=False)
+
+@st.cache_data(ttl=3600,show_spinner=False)
 def get_place_opening_hours(place, date):
     if 'opening_hours' not in place or 'periods' not in place['opening_hours']:
         return "Opening hours not available" 

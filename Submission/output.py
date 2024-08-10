@@ -18,7 +18,7 @@ from io import BytesIO
 pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf'))
 pdfmetrics.registerFont(TTFont('DejaVuSans-Bold', 'DejaVuSans-Bold.ttf'))
 
-@st.cache_data(ttl=3600)
+@st.cache_data(ttl=3600,show_spinner=False)
 def create_itinerary_pdf(itinerary, set_number, itinerary_number, mode_of_transport):
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=landscape(letter), rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30)
@@ -183,7 +183,7 @@ def generate_df(itinerary_set):
     df = pd.DataFrame(itinerary_data, columns=columns)
     return df
 
-@st.cache_data(ttl=3600)
+@st.cache_data(ttl=3600,show_spinner=False)
 def send_to_gsheets(email_address,destination,start_date,end_date):
     if st.session_state.all_generated_itineraries:
         most_recent_set = st.session_state.all_generated_itineraries[-1]
