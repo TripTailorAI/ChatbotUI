@@ -4,6 +4,10 @@ from get_itinerary import get_daily_itinerary, get_nightlife_itinerary, is_place
 from output import create_itinerary_pdf, display_itinerary, generate_df, send_to_gsheets, getAccessToken, send_email
 import time
 import pandas as pd
+GOOGLE_API_KEY = st.secrets['GOOGLE_API_KEY']
+genai.configure(api_key=GOOGLE_API_KEY)
+google_places_api_key = st.secrets['MAPS_API_KEY']
+weather_api_key = st.secrets['WEATHER']
 
 @st.cache_data(ttl=3600)
 def create_travel_itinerary(destination, country, start_date, end_date, hotel_name, purpose_of_stay, mode_of_transport, custom_preferences):
