@@ -1,4 +1,4 @@
-def streamlit_page:
+def streamlit_page():
     # Streamlit app
     st.title("TripTailorAI🌎")
     # Short instructions
