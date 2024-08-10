@@ -28,8 +28,7 @@ genai.configure(api_key=GOOGLE_API_KEY)
 google_places_api_key = st.secrets['MAPS_API_KEY']
 weather_api_key = st.secrets['WEATHER']
 
-@st.cache(show_spinner=False)
-@st.cache_data(ttl=3600)
+@st.cache_data(ttl=3600,show_spinner=False)
 def get_daily_itinerary(destination, country, date, hotel_name, purpose_of_stay, weather_forecast, day_number, trip_length, used_places, mode_of_transport, custom_preferences):
     used_places_str = ", ".join(used_places)
     user_message = f"""
@@ -89,8 +88,7 @@ def get_daily_itinerary(destination, country, date, hotel_name, purpose_of_stay,
         print(f"Exception traceback: {traceback.format_exc()}")
         return None
         
-@st.cache(show_spinner=False)
-@st.cache_data(ttl=3600)
+@st.cache_data(ttl=3600,show_spinner=False)
 def get_nightlife_itinerary(destination, country, date, hotel_name, purpose_of_stay, weather_forecast, day_number, trip_length, used_places, mode_of_transport, custom_preferences):
     used_places_str = ", ".join(used_places)
     user_message = f"""
@@ -147,8 +145,7 @@ def get_nightlife_itinerary(destination, country, date, hotel_name, purpose_of_s
         print(f"Exception traceback: {traceback.format_exc()}")
         return None
 
-@st.cache(show_spinner=False)
-@st.cache_data(ttl=86400)
+@st.cache_data(ttl=3600,show_spinner=False)
 def is_place_in_location(place, destination, country):
     address = place['formatted_address'].lower()
     return (destination.lower() in address or country.lower() in address or
@@ -156,8 +153,7 @@ def is_place_in_location(place, destination, country):
                 country.lower() in component['long_name'].lower()
                 for component in place.get('address_components', [])))
 
-@st.cache(show_spinner=False)
-@st.cache_data(ttl=86400)
+@st.cache_data(ttl=3600,show_spinner=False)
 def get_place_opening_hours(place, date):
     if 'opening_hours' not in place or 'periods' not in place['opening_hours']:
         return "Opening hours not available" 
