@@ -805,12 +805,14 @@ custom_preferences = st.sidebar.text_input("✨ Custom Preferences",
 
 st.session_state.custom_preferences = custom_preferences
 
-generate_nightlife = st.sidebar.checkbox(
+if 'generate_nightlife' not in st.session_state:
+    st.session_state.generate_nightlife = False
+
+# In the sidebar, where you create the checkbox:
+st.sidebar.checkbox(
     "🌙 Generate Nightlife Itinerary",
-    value=st.session_state.get('generate_nightlife', False),
     key="generate_nightlife"
 )
-st.session_state.generate_nightlife = generate_nightlife
 
 
 if st.sidebar.button("✍ Generate Itineraries"):
