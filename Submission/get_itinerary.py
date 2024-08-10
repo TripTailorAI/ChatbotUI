@@ -1,3 +1,4 @@
+@st.cache_data(ttl=3600)
 def get_daily_itinerary(destination, country, date, hotel_name, purpose_of_stay, weather_forecast, day_number, trip_length, used_places, mode_of_transport, custom_preferences):
     used_places_str = ", ".join(used_places)
     user_message = f"""
@@ -57,6 +58,7 @@ def get_daily_itinerary(destination, country, date, hotel_name, purpose_of_stay,
         print(f"Exception traceback: {traceback.format_exc()}")
         return None
         
+@st.cache_data(ttl=3600)
 def get_nightlife_itinerary(destination, country, date, hotel_name, purpose_of_stay, weather_forecast, day_number, trip_length, used_places, mode_of_transport, custom_preferences):
     used_places_str = ", ".join(used_places)
     user_message = f"""
@@ -112,6 +114,7 @@ def get_nightlife_itinerary(destination, country, date, hotel_name, purpose_of_s
         print(f"Exception type: {type(e)}")
         print(f"Exception traceback: {traceback.format_exc()}")
         return None
+
 @st.cache_data(ttl=86400)
 def is_place_in_location(place, destination, country):
     address = place['formatted_address'].lower()

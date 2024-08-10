@@ -1,3 +1,4 @@
+@st.cache_data(ttl=3600)
 def create_travel_itinerary(destination, country, start_date, end_date, hotel_name, purpose_of_stay, mode_of_transport, custom_preferences):
     weather_forecast_data = get_weather_forecast(destination)
     num_days = (pd.to_datetime(end_date) - pd.to_datetime(start_date)).days + 1
@@ -99,6 +100,7 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
         all_itineraries.append(itinerary)
     return all_itineraries
 
+@st.cache_data(ttl=3600)
 def create_night_itinerary(destination, country, start_date, end_date, hotel_name, purpose_of_stay, mode_of_transport, custom_preferences):
     weather_forecast_data = get_weather_forecast(destination)
     num_days = (pd.to_datetime(end_date) - pd.to_datetime(start_date)).days + 1

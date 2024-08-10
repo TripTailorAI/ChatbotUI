@@ -1,3 +1,4 @@
+@st.cache_data(ttl=3600)
 def streamlit_pageconfig():
     st.set_page_config(layout="wide")
     if 'messages' not in st.session_state:
