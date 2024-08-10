@@ -67,7 +67,7 @@ def create_itinerary_pdf(itinerary, set_number, itinerary_number, mode_of_transp
     buffer.seek(0)
     return buffer
 
-    def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport):
+def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport):
     itinerary_message = ""
     day_data = []
     for day in itinerary:
@@ -121,7 +121,7 @@ def create_itinerary_pdf(itinerary, set_number, itinerary_number, mode_of_transp
     
     return day_data
 
-    def generate_df(itinerary_set):
+def generate_df(itinerary_set):
     itinerary_data = []
     columns = ['itinerary_version', 'date', 'weather', 'time', 'activity', 'place', 'MapsLink', 'Address', 'Hours']
     
@@ -162,7 +162,7 @@ def create_itinerary_pdf(itinerary, set_number, itinerary_number, mode_of_transp
     df = pd.DataFrame(itinerary_data, columns=columns)
     return df
 
-    def send_to_gsheets():
+def send_to_gsheets():
     if st.session_state.all_generated_itineraries:
         most_recent_set = st.session_state.all_generated_itineraries[-1]
         df = generate_df(most_recent_set)
@@ -199,12 +199,12 @@ def create_itinerary_pdf(itinerary, set_number, itinerary_number, mode_of_transp
 
 
 def getAccessToken():
-        service_account_email = st.secrets["gcp_service_email"]
-        # SERVICE_ACCOUNT_FILE = "sheets-drive-api-1-7785bd353bca.json" # Please set your value.
-        # creds = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=["https://www.googleapis.com/auth/drive.readonly"])
-        creds = Credentials.from_service_account_info(service_account_email,scopes=["https://www.googleapis.com/auth/drive.readonly"])
-        creds.refresh(google.auth.transport.requests.Request())
-        return creds.token
+    service_account_email = st.secrets["gcp_service_email"]
+    # SERVICE_ACCOUNT_FILE = "sheets-drive-api-1-7785bd353bca.json" # Please set your value.
+    # creds = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=["https://www.googleapis.com/auth/drive.readonly"])
+    creds = Credentials.from_service_account_info(service_account_email,scopes=["https://www.googleapis.com/auth/drive.readonly"])
+    creds.refresh(google.auth.transport.requests.Request())
+    return creds.token
     
 def send_email(arguments):
     functionName = "maincall"
