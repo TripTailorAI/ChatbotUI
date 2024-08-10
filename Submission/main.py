@@ -40,6 +40,3 @@ pdfmetrics.registerFont(TTFont('DejaVuSans-Bold', 'DejaVuSans-Bold.ttf'))
 streamlit_pageconfig()
 streamlit_page()
 @st.cache_data(ttl=3600)
-
-if name == "main":
-    main()
