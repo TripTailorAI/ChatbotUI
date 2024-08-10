@@ -171,7 +171,7 @@ def streamlit_page():
         # Display the most recently generated itinerary set
         most_recent_set = st.session_state.all_generated_itineraries[-1]
         st.write("## Most Recent Itineraries")
-       if isinstance(most_recent_set, dict):
+        if isinstance(most_recent_set, dict):
             day_itineraries = most_recent_set.get('day', [])
             night_itineraries = most_recent_set.get('night') if st.session_state.generate_nightlife else None
         else:
