@@ -56,7 +56,6 @@ def streamlit_pageconfig():
 
 countries = sorted([country.name for country in pycountry.countries])
 
-@st.cache(show_spinner=False)
 def streamlit_page():
     # Streamlit app
     st.title("TripTailorAI🌎")
