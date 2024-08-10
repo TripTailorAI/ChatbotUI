@@ -27,9 +27,7 @@ from output import create_itinerary_pdf, display_itinerary, generate_df, send_to
 from create_itinerary import create_travel_itinerary, create_night_itinerary
 from streamlit_page import streamlit_page
 
-streamlit_pageconfig()
-streamlit_page()
-@st.cache_data(ttl=3600)
+
 
 GOOGLE_API_KEY = st.secrets['GOOGLE_API_KEY']
 genai.configure(api_key=GOOGLE_API_KEY)
@@ -40,4 +38,7 @@ pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf'))
 pdfmetrics.registerFont(TTFont('DejaVuSans-Bold', 'DejaVuSans-Bold.ttf'))
 
 if name == "main":
+    streamlit_pageconfig()
+    streamlit_page()
+    @st.cache_data(ttl=3600)
     main() 
