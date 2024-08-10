@@ -1,5 +1,4 @@
 from streamlit_page import streamlit_page, streamlit_pageconfig
-# from streamlit_config import streamlit_pageconfig
 import streamlit as st
 
 from place_weather import get_place_details, get_weather_forecast
@@ -9,6 +8,5 @@ from create_itinerary import create_travel_itinerary, create_night_itinerary
 st.set_page_config(layout="wide")
 
 streamlit_pageconfig()
-
 streamlit_page()
 
