@@ -8,7 +8,6 @@ from datetime import datetime, timedelta, date
 import traceback
 import time
 import pycountry
-import pygsheets
 from google.oauth2.service_account import Credentials
 from google.oauth2 import service_account
 import google.auth.transport.requests
