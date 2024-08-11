@@ -102,9 +102,9 @@ def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport
             place_name = activity['place']['name']
             address = activity['place']['formatted_address']
             opening_hours = activity.get('opening_hours', 'N/A')
-            activity_url = activity['place'].get('url', '')
-            encoded_url = quote_plus(activity_url.encode('utf-8'))            
-            itinerary_message += f"- {time}: {activity_name} at [{place_name}]({encoded_url})\n"
+            activity_url = activity['place'].get('url', '#')
+            encoded_urlx = quote_plus(activity_url.encode('utf-8'))            
+            itinerary_message += f"- {time}: {activity_name} at [{place_name}]({encoded_urlx})\n"
             itinerary_message += f"  - Address: {address}\n"
             itinerary_message += f"  - Opening Hours: {opening_hours}\n"
             if i < len(day['activities']) - 1:
