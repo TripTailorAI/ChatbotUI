@@ -214,6 +214,7 @@ def streamlit_page():
         # Display the most recently generated itinerary set
         most_recent_set = st.session_state.all_generated_itineraries[-1]
         st.write("## Most Recent Itineraries")
+        st.write(most_recent_set)
         if isinstance(most_recent_set, dict):
             day_itineraries = most_recent_set.get('day', [])
             night_itineraries = most_recent_set.get('night') if st.session_state.generate_nightlife else None
@@ -293,15 +294,6 @@ def streamlit_page():
             "role": "assistant",
             "content": f"Generated {len(st.session_state.all_generated_itineraries)} set(s) of itineraries for {destination}, {country}. Total itineraries: {total_itineraries}."
         })
-
-        # if st.sidebar.button("Email All Itineraries", key="export_all_itineraries"):
-        #     if send_to_gsheets(email_address,destination,start_date,end_date):
-        #         arguments = ['V1','V2','V3']
-        #         send_email(arguments)
-        #         st.sidebar.success("Most recent itinerary set exported successfully!")
-        #     else:
-        #         st.sidebar.error("No itineraries to export. Please generate an itinerary first.")
-
 
         # Add the generated itineraries to the message history
         if st.session_state.all_generated_itineraries:
