@@ -65,7 +65,7 @@ def get_place_details(query, location, radius=5000, min_rating=2.5, min_reviews=
     
     # Select the top place
     top_place = sorted_places[0]
-    st.write(top_place)
+    # st.write(top_place)
 
     # Get details for the top place
     # place_id = top_place['place_id']
@@ -82,7 +82,7 @@ def get_place_details(query, location, radius=5000, min_rating=2.5, min_reviews=
         "name": top_place['name'],
         "formatted_address": top_place['formatted_address'],
         "type": top_place['type'] if 'type' in top_place else 'NA',
-        "opening_hours": top_place['opening_hours'] if 'opening_hours' in top_place else None,
+        "opening_hours": top_place['opening_hours'] if 'opening_hours' in top_place else {None},
         "rating": top_place['rating'] if 'rating' in top_place else None,
         "user_ratings_total": top_place['user_ratings_total'] if 'user_ratings_total' in top_place else None,
         'url': f"https://www.google.com/maps/search/{top_place['formatted_address']}" if 'url' in top_place else None
