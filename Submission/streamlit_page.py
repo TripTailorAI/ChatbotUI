@@ -141,10 +141,11 @@ def streamlit_page():
     c = st.sidebar.container
     col1, col2 = st.columns(2)
 
-    with col1:
-        c.button('1')
-    with col2:
-        c.button('2')
+    with c:
+        with col1:
+            c.button('1')
+        with col2:  
+            c.button('2')
 
 
     if st.sidebar.button("✍ Generate Itineraries"):
