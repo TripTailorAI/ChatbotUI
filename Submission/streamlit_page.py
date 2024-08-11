@@ -236,29 +236,56 @@ def streamlit_page():
         else:
             day_itineraries = most_recent_set
             night_itineraries = None
+        
+        tab_labels = [f"Version {i+1}" for i in range(len(day_itineraries))]
+        tabs = st.tabs(tab_labels)
 
-        for itinerary_number, day_itinerary in enumerate(day_itineraries, 1):
-            with st.expander(f"Itinerary {itinerary_number}", expanded=True):
-                if st.session_state.generate_nightlife:
-                    col1, col2 = st.columns(2)
-                    
-                    with col1:
-                        st.write("#### 🌇 Day Itinerary")
-                        day_data = display_itinerary(day_itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport,email_address,destination,start_date,end_date)
+        for itinerary_number, (tab, day_itinerary) in enumerate(zip(tabs, day_itineraries), 1):
+            with tab:
+                with st.expander("Itinerary Details", expanded=True):
+                    if st.session_state.generate_nightlife:
+                        col1, col2 = st.columns(2)
+                        
+                        with col1:
+                            st.write("#### 🌇 Day Itinerary")
+                            day_data = display_itinerary(day_itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport, email_address, destination, start_date, end_date)
+                            table_data.extend(day_data)
+                        
+                        with col2:
+                            st.write("#### 🌃 Night Itinerary ")
+                            if night_itineraries and itinerary_number <= len(night_itineraries):
+                                night_itinerary = night_itineraries[itinerary_number - 1]
+                                night_data = display_itinerary(night_itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport, email_address, destination, start_date, end_date)
+                                table_data.extend(night_data)
+                            else:
+                                st.write("No nightlife itinerary for this day.")
+                    else:
+                        st.write("#### Day Itinerary")
+                        day_data = display_itinerary(day_itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport, email_address, destination, start_date, end_date)
                         table_data.extend(day_data)
+
+        # for itinerary_number, day_itinerary in enumerate(day_itineraries, 1):
+        #     with st.expander(f"Itinerary {itinerary_number}", expanded=True):
+        #         if st.session_state.generate_nightlife:
+        #             col1, col2 = st.columns(2)
                     
-                    with col2:
-                        st.write("#### 🌃 Night Itinerary ")
-                        if night_itineraries and itinerary_number <= len(night_itineraries):
-                            night_itinerary = night_itineraries[itinerary_number - 1]
-                            night_data = display_itinerary(night_itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport,email_address,destination,start_date,end_date)
-                            table_data.extend(night_data)
-                        else:
-                            st.write("No nightlife itinerary for this day.")
-                else:
-                    st.write("#### Day Itinerary")
-                    day_data = display_itinerary(day_itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport,email_address,destination,start_date,end_date)
-                    table_data.extend(day_data)
+        #             with col1:
+        #                 st.write("#### 🌇 Day Itinerary")
+        #                 day_data = display_itinerary(day_itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport,email_address,destination,start_date,end_date)
+        #                 table_data.extend(day_data)
+                    
+        #             with col2:
+        #                 st.write("#### 🌃 Night Itinerary ")
+        #                 if night_itineraries and itinerary_number <= len(night_itineraries):
+        #                     night_itinerary = night_itineraries[itinerary_number - 1]
+        #                     night_data = display_itinerary(night_itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport,email_address,destination,start_date,end_date)
+        #                     table_data.extend(night_data)
+        #                 else:
+        #                     st.write("No nightlife itinerary for this day.")
+        #         else:
+        #             st.write("#### Day Itinerary")
+        #             day_data = display_itinerary(day_itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport,email_address,destination,start_date,end_date)
+        #             table_data.extend(day_data)
 
         # Display all previously generated itinerary sets in reverse order
         if len(st.session_state.all_generated_itineraries) > 1:
