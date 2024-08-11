@@ -340,9 +340,6 @@ def streamlit_page():
                                 st.write("#### Day Itinerary")
                                 day_data = display_itinerary(day_itinerary, set_number, itinerary_number, mode_of_transport,email_address,destination,start_date,end_date)
                                 table_data.extend(day_data)
-
-        # Create the DataFrame
-        # dfi = pd.DataFrame(table_data, columns=['Date', 'Weather', 'Time', 'Activity', 'Place', 'Address', 'Opening Hours'])
         
         # Add the generated itineraries to the message history
         if st.session_state.all_generated_itineraries:
