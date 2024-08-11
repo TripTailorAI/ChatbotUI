@@ -175,13 +175,14 @@ def streamlit_page():
 
 
 
-            # # Add content to the first column
-            # with col1:
-            #     st.button("Button 1")
-
-            # # Add content to the second column
-            # with col2:
-            #     st.button("Button 2")
+    if st.button("✍ Generate Itineraries"):
+        with st.spinner("Generating itinerary, please wait..."):
+            try:
+                st.success(f"Itinerary set {st.session_state.itinerary_set_count} generated successfully!")
+            except Exception as e:
+                st.sidebar.error(f"An error occurred while creating the itinerary: {str(e)}")
+                st.sidebar.error(f"Exception type: {type(e)}")
+                st.sidebar.error(f"Exception traceback: {traceback.format_exc()}")
 
     with st.sidebar:
         # Add a container inside the sidebar
