@@ -229,7 +229,7 @@ def streamlit_page():
                     start = datetime.combine(start_date, datetime.min.time())
                     end = datetime.combine(end_date, datetime.min.time())
                     # Validation conditions
-                    if end <= start:
+                    if end < start:
                         st.error("Error: End date must be after the start date.")
                     elif (end - start).days > 7:
                         st.error("Error: The difference between start and end date must be 7 days")
