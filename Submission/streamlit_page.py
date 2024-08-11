@@ -178,8 +178,8 @@ def streamlit_page():
         help="Enter any special requirements or preferences for your trip here.")
 
     st.session_state.custom_preferences = custom_preferences
-    if st.session_state.custom_preferences:
-        st.session_state.custom_preferences = ""
+    # if st.session_state.custom_preferences:
+    #     st.session_state.custom_preferences = ""
 
     if 'generate_nightlife' not in st.session_state:
         st.session_state.generate_nightlife = False
