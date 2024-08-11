@@ -22,6 +22,7 @@ def format_date(date_string):
     return formatted_date
 
 def streamlit_pageconfig():
+#Initializing Session States
     if 'messages' not in st.session_state:
         st.session_state.messages = []
 
@@ -63,8 +64,10 @@ def streamlit_pageconfig():
     if 'custom_preferences' not in st.session_state:
         st.session_state.custom_preferences = ""
 
-    # List of all countries
+    if 'button_clicked' not in st.session_state:
+        st.session_state.button_clicked = False
 
+    # List of all countries
 countries = sorted([country.name for country in pycountry.countries])
 
 def streamlit_page():
@@ -357,6 +360,3 @@ def streamlit_page():
 
 def button_click():
     st.session_state.button_clicked = True
-
-if 'button_clicked' not in st.session_state:
-    st.session_state.button_clicked = False
