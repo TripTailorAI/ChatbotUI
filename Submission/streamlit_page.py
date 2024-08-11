@@ -2,15 +2,14 @@ import streamlit as st
 import pycountry
 from datetime import datetime, timedelta, date
 import traceback
-from io import BytesIO
-from place_weather import get_place_details, get_weather_forecast
-from get_itinerary import get_daily_itinerary, get_nightlife_itinerary
-from output import create_itinerary_pdf, display_itinerary, generate_df, send_to_gsheets, getAccessToken, send_email
+# from io import BytesIO
+# from place_weather import get_place_details, get_weather_forecast
+# from get_itinerary import get_daily_itinerary, get_nightlife_itinerary
+from output import display_itinerary, send_to_gsheets, send_email
 from create_itinerary import create_travel_itinerary, create_night_itinerary
 import time
 import pandas as pd
-
-from datetime import datetime
+# from datetime import datetime
 
 def format_date(date_string):
     # Parse the input date string
@@ -351,7 +350,7 @@ def streamlit_page():
                                 table_data.extend(day_data)
 
         # Create the DataFrame
-        dfi = pd.DataFrame(table_data, columns=['Date', 'Weather', 'Time', 'Activity', 'Place', 'Address', 'Opening Hours'])
+        # dfi = pd.DataFrame(table_data, columns=['Date', 'Weather', 'Time', 'Activity', 'Place', 'Address', 'Opening Hours'])
         
         # Add the generated itineraries to the message history
         if st.session_state.all_generated_itineraries:
