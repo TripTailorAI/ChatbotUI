@@ -174,15 +174,50 @@ def streamlit_page():
     )
 
 
-
-    if st.button("✍ Generate Itineraries"):
+    if st.session_state.button_clicked:
         with st.spinner("Generating itinerary, please wait..."):
             try:
+                start_time = time.time()
+                new_day_itineraries = create_travel_itinerary(
+                    destination, country, start_date.strftime("%Y-%m-%d"), 
+                    end_date.strftime("%Y-%m-%d"), hotel_name, purpose_of_stay, 
+                    mode_of_transport_value, custom_preferences
+                )
+                day_time = time.time() - start_time
+
+                new_night_itineraries = None
+                if st.session_state.generate_nightlife:
+                    new_night_itineraries = create_night_itinerary(
+                        destination, country, start_date.strftime("%Y-%m-%d"), 
+                        end_date.strftime("%Y-%m-%d"), hotel_name, purpose_of_stay, 
+                        mode_of_transport_value, custom_preferences
+                    )
+                
+                st.session_state.all_generated_itineraries.append({
+                    'trip_details': {
+                        'destination': destination,
+                        'country': country,
+                        'start_date': start_date.strftime("%Y-%m-%d"),
+                        'end_date': end_date.strftime("%Y-%m-%d"),
+                        'hotel_name': hotel_name,
+                        'purpose_of_stay': purpose_of_stay,
+                        'mode_of_transport': mode_of_transport,
+                    },
+                    'day': new_day_itineraries,
+                    'night': new_night_itineraries
+                })
+                st.session_state.itinerary_set_count += 1
+                end_time = time.time()  # Stop the timer
+                elapsed_time = end_time - start_time  # Calculate elapsed time
+                #st.markdown(elapsed_time)
                 st.success(f"Itinerary set {st.session_state.itinerary_set_count} generated successfully!")
+                st.session_state.button_clicked = False
+
             except Exception as e:
                 st.sidebar.error(f"An error occurred while creating the itinerary: {str(e)}")
                 st.sidebar.error(f"Exception type: {type(e)}")
                 st.sidebar.error(f"Exception traceback: {traceback.format_exc()}")
+
 
     with st.sidebar:
         # Add a container inside the sidebar
@@ -190,48 +225,7 @@ def streamlit_page():
             # Create two columns inside the container
             col1, col2 = st.columns(2)
             with col1:
-                if st.button("✍ Generate Itineraries"):
-                    with st.spinner("Generating itinerary, please wait..."):
-                        try:
-                            start_time = time.time()
-                            new_day_itineraries = create_travel_itinerary(
-                                destination, country, start_date.strftime("%Y-%m-%d"), 
-                                end_date.strftime("%Y-%m-%d"), hotel_name, purpose_of_stay, 
-                                mode_of_transport_value, custom_preferences
-                            )
-                            day_time = time.time() - start_time
-
-                            new_night_itineraries = None
-                            if st.session_state.generate_nightlife:
-                                new_night_itineraries = create_night_itinerary(
-                                    destination, country, start_date.strftime("%Y-%m-%d"), 
-                                    end_date.strftime("%Y-%m-%d"), hotel_name, purpose_of_stay, 
-                                    mode_of_transport_value, custom_preferences
-                                )
-                            
-                            st.session_state.all_generated_itineraries.append({
-                                'trip_details': {
-                                    'destination': destination,
-                                    'country': country,
-                                    'start_date': start_date.strftime("%Y-%m-%d"),
-                                    'end_date': end_date.strftime("%Y-%m-%d"),
-                                    'hotel_name': hotel_name,
-                                    'purpose_of_stay': purpose_of_stay,
-                                    'mode_of_transport': mode_of_transport,
-                                },
-                                'day': new_day_itineraries,
-                                'night': new_night_itineraries
-                            })
-                            st.session_state.itinerary_set_count += 1
-                            end_time = time.time()  # Stop the timer
-                            elapsed_time = end_time - start_time  # Calculate elapsed time
-                            #st.markdown(elapsed_time)
-                            st.success(f"Itinerary set {st.session_state.itinerary_set_count} generated successfully!")
-                        except Exception as e:
-                            st.sidebar.error(f"An error occurred while creating the itinerary: {str(e)}")
-                            st.sidebar.error(f"Exception type: {type(e)}")
-                            st.sidebar.error(f"Exception traceback: {traceback.format_exc()}")
- 
+                if st.button("✍ Generate Itineraries",on_click=button_click): 
             with col2:
                 if st.session_state.all_generated_itineraries:
                     if st.button("Email All Itineraries", key="export_all_itineraries"):
@@ -350,3 +344,9 @@ def streamlit_page():
             "role": "assistant",
             "content": f"Generated {len(st.session_state.all_generated_itineraries)} set(s) of itineraries for {destination}, {country}. Total itineraries: {total_itineraries}."
         })
+
+def button_click():
+    st.session_state.button_clicked = True
+
+if 'button_clicked' not in st.session_state:
+    st.session_state.button_clicked = False
