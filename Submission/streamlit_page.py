@@ -85,14 +85,35 @@ def streamlit_page():
 
     st.markdown(
         """
-       <style>
-       [data-testid="stSidebar"][aria-expanded="true"]{
-           min-width: 450px;
-           max-width: 450px;
-       }
-       """,
-        unsafe_allow_html=True,
-    )   
+        <style>
+        /* Sidebar styling */
+        [data-testid="stSidebar"][aria-expanded="true"] {
+            min-width: 450px;
+            max-width: 450px;
+        }
+
+        /* Tab styling */
+        .stTabs [data-baseweb="tab-list"] {
+            gap: 24px;
+        }
+
+        .stTabs [data-baseweb="tab"] {
+            height: 50px;
+            white-space: pre-wrap;
+            background-color: #F0F2F6;
+            border-radius: 4px 4px 0px 0px;
+            gap: 1px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .stTabs [aria-selected="true"] {
+            background-color: #FFFFFF;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    ) 
 
     # Input fields
     # Email address input
