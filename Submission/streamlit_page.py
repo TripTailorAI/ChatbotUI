@@ -213,8 +213,12 @@ def streamlit_page():
         table_data = []        
         # Display the most recently generated itinerary set
         most_recent_set = st.session_state.all_generated_itineraries[-1]
-        st.write("## Most Recent Itineraries")
-        st.write(most_recent_set)
+        # st.write("## Most Recent Itineraries")
+        # st.write(most_recent_set)
+        trip_details = most_recent_set.get('trip_details')
+        st.write(f"#### Trip Destination: {trip_details['destination']}, {trip_details['country']}")
+        st.write(f"#### Date: {trip_details['start_date']} - {trip_details['end_date']}")
+
         if isinstance(most_recent_set, dict):
             day_itineraries = most_recent_set.get('day', [])
             night_itineraries = most_recent_set.get('night') if st.session_state.generate_nightlife else None
