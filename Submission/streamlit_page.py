@@ -138,15 +138,23 @@ def streamlit_page():
         key="generate_nightlife"
     )
 
-    c = st.sidebar.container
-    col1, col2 = st.columns(2)
+    with st.sidebar:
+        # Add a container inside the sidebar
+        with st.container():
+            st.write("This is a container inside the sidebar")
+            
+            # Create two columns inside the container
+            col1, col2 = st.columns(2)
 
-    with c:
-        with col1:
-            c.button('1')
-        with col2:  
-            c.button('2')
+            # Add content to the first column
+            with col1:
+                st.write("Column 1")
+                st.button("Button 1")
 
+            # Add content to the second column
+            with col2:
+                st.write("Column 2")
+                st.button("Button 2")
 
     if st.sidebar.button("✍ Generate Itineraries"):
         with st.spinner("Generating itinerary, please wait..."):
