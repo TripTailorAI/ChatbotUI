@@ -8,6 +8,7 @@ TripTailorAI is an intelligent travel itinerary generator that creates personali
    - handicap accessible itineraries
    - vegetarian friendly optipons
    - and other customisations
+- Accurate Travel Time estimations that even supports Public transport (where available) 
 
 ## Features
 - 🗺️ Generate detailed and customised travel itineraries for any destination
