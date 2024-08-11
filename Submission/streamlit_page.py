@@ -98,13 +98,13 @@ def streamlit_page():
         }
 
         .stTabs [data-baseweb="tab"] {
-            height: 50px;
+            height: 30px;
             /* white-space: pre-wrap; */
             background-color: #FFFFFF;
             border-radius: 2px 2px 2px 2px;
             gap: 2px;
-            padding-top: 10px;
-            padding-bottom: 10px;
+            padding-top: 2px;
+            padding-bottom: 2px;
         }
 
         .stTabs [aria-selected="true"] {
