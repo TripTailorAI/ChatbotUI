@@ -67,9 +67,20 @@ def streamlit_page():
     3. Click 'Generate Itineraries'
     4. Review and export your personalized travel plans!
     """)
-
+    
     # Sidebar for itinerary generation
     st.sidebar.title("Itinerary Generator")
+
+    st.markdown(
+        """
+       <style>
+       [data-testid="stSidebar"][aria-expanded="true"]{
+           min-width: 450px;
+           max-width: 450px;
+       }
+       """,
+        unsafe_allow_html=True,
+    )   
 
     # Input fields
     # Email address input
