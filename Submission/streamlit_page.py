@@ -227,7 +227,7 @@ def streamlit_page():
         # st.write("## Most Recent Itineraries")
         # st.write(most_recent_set)
         trip_details = most_recent_set.get('trip_details')
-        st.write(f"#### {trip_details['destination']}, {trip_details['country']} | {format_date(trip_details['start_date'])} to {format_date(trip_details['end_date'])}")
+        st.write(f"#### {trip_details['destination']}, {trip_details['country']}     |     {format_date(trip_details['start_date'])} to {format_date(trip_details['end_date'])}")
 
 
         if isinstance(most_recent_set, dict):
@@ -265,7 +265,7 @@ def streamlit_page():
             st.write("## Previously Generated Itineraries")
             for set_number, itinerary_set in reversed(list(enumerate(st.session_state.all_generated_itineraries[:-1], 1))):
                 trip_details = itinerary_set.get('trip_details')
-                st.write(f"#### {trip_details['destination']}, {trip_details['country']} | {trip_details['start_date']} to {trip_details['end_date']}")
+                st.write(f"#### {trip_details['destination']}, {trip_details['country']}     |     {format_date(trip_details['start_date'])} to {format_date(trip_details['end_date'])}")
             
                 if isinstance(itinerary_set, dict):
                     day_itineraries = itinerary_set.get('day', [])
