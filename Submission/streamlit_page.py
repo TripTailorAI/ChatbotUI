@@ -357,20 +357,20 @@ def output_display_page(day_itineraries):
                     
                     with col1:
                         st.write("#### 🌇 Day Itinerary")
-                        day_data = display_itinerary(day_itinerary, itinerary_set_count, itinerary_number, mode_of_transport, email_address, destination, start_date, end_date)
+                        day_data = display_itinerary(day_itinerary, 1, itinerary_number, mode_of_transport, email_address, destination, start_date, end_date)
                         table_data.extend(day_data)
                     
                     with col2:
                         st.write("#### 🌃 Night Itinerary ")
                         if night_itineraries and itinerary_number <= len(night_itineraries):
                             night_itinerary = night_itineraries[itinerary_number - 1]
-                            night_data = display_itinerary(night_itinerary, itinerary_set_count, itinerary_number, mode_of_transport, email_address, destination, start_date, end_date)
+                            night_data = display_itinerary(night_itinerary, 1, itinerary_number, mode_of_transport, email_address, destination, start_date, end_date)
                             table_data.extend(night_data)
                         else:
                             st.write("No nightlife itinerary for this day.")
                 else:
                     st.write("#### Day Itinerary")
-                    day_data = display_itinerary(day_itinerary, itinerary_set_count, itinerary_number, mode_of_transport, email_address, destination, start_date, end_date)
+                    day_data = display_itinerary(day_itinerary, 1, itinerary_number, mode_of_transport, email_address, destination, start_date, end_date)
                     table_data.extend(day_data)
 
     # for itinerary_number, day_itinerary in enumerate(day_itineraries, 1):
