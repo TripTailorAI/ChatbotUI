@@ -4,10 +4,10 @@ TripTailorAI is an intelligent travel itinerary generator that creates personali
 
 ## What Makes it Unique
 - Made with end user in mind - Get a simple pdf guide in Grid format with map links to places
-- With the custom prompt, you can even tell TripTailor to provide :
--- handicap accessible itineraries
--- vegetarian friendly optipons
--- and other customisations
+- With the custom prompt, you can even tell TripTailor to provide
+   - handicap accessible itineraries
+   - vegetarian friendly optipons
+   - and other customisations
 
 ## Features
 - 🗺️ Generate detailed and customised travel itineraries for any destination
