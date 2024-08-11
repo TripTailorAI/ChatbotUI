@@ -62,6 +62,8 @@ def streamlit_pageconfig():
     if 'button_clicked' not in st.session_state:
         st.session_state.button_clicked = False
 
+    st.session_state.custom_preferences = "E.g. Handicap accessible places / vegetarian friendly options."
+
     # List of all countries
 countries = sorted([country.name for country in pycountry.countries])
 
