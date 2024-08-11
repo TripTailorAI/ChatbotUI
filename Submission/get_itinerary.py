@@ -1,27 +1,9 @@
-# from streamlit_page import streamlit_page, streamlit_pageconfig
-# from streamlit_config import streamlit_pageconfig
 import streamlit as st
-import requests
 import json
-import pandas as pd
-import random
 import google.generativeai as genai
-from datetime import datetime, timedelta, date
+from datetime import datetime
 import traceback
-import time
-import pycountry
-import pygsheets
-from google.oauth2.service_account import Credentials
-from google.oauth2 import service_account
-import google.auth.transport.requests
-from reportlab.lib import colors
-from reportlab.lib.pagesizes import letter, landscape
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import inch
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-from io import BytesIO
+
 
 GOOGLE_API_KEY = st.secrets['GOOGLE_API_KEY']
 genai.configure(api_key=GOOGLE_API_KEY)
@@ -90,7 +72,7 @@ def get_daily_itinerary(destination, country, date, hotel_name, purpose_of_stay,
         
 @st.cache_data(ttl=3600,show_spinner=False)
 def get_nightlife_itinerary(destination, country, date, hotel_name, purpose_of_stay, weather_forecast, day_number, trip_length, used_places, mode_of_transport, custom_preferences):
-    used_places_str = ", ".join(used_places)
+    # used_places_str = ", ".join(used_places)
     user_message = f"""
     Create a daily nightlife itinerary starting for day {day_number} of a {trip_length}-day trip to {destination}, {country}.
     It should start from 22:00 on {date} and end at 04:00 the next day
