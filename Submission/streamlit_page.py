@@ -179,7 +179,7 @@ def streamlit_page():
 
     if st.session_state.custom_preferences:
         st.session_state.custom_preferences = ""
-    st.session_state.custom_preferences = custom_preferences
+    # st.session_state.custom_preferences = custom_preferences
 
     if 'generate_nightlife' not in st.session_state:
         st.session_state.generate_nightlife = False
