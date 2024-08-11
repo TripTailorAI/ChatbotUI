@@ -153,10 +153,10 @@ def streamlit_page():
             # Create two columns inside the container
             col1, col2 = st.columns(2)
             with col1:
-                start_date = st.sidebar.date_input("🗓️ Start Date", min_value=tomorrow, value=st.session_state.start_date)
+                start_date = st.date_input("🗓️ Start Date", min_value=tomorrow, value=st.session_state.start_date)
                 st.session_state.start_date = start_date
             with col2:
-                end_date = st.sidebar.date_input("🗓️ End Date", min_value=tomorrow, value=st.session_state.end_date)
+                end_date = st.date_input("🗓️ End Date", min_value=tomorrow, value=st.session_state.end_date)
                 st.session_state.end_date = end_date
 
     purpose_of_stay = st.sidebar.selectbox("🎯 Purpose of Stay", ["Vacation", "Business"], index=["Vacation", "Business"].index(st.session_state.purpose_of_stay))
