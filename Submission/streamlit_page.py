@@ -225,8 +225,8 @@ def streamlit_page():
             # Create two columns inside the container
             col1, col2 = st.columns(2)
             with col1:
-                if st.button("✍ Generate Itineraries",on_click=button_click):
-                     
+                if st.button("✍ Generate Itineraries"):
+                    button_click()
             with col2:
                 if st.session_state.all_generated_itineraries:
                     if st.button("Email All Itineraries", key="export_all_itineraries"):
