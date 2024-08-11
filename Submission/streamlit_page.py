@@ -154,7 +154,7 @@ def streamlit_page():
             # Create two columns inside the container
             col1, col2 = st.columns(2)
             with col1:
-                if st.sidebar.button("✍ Generate Itineraries"):
+                if st.button("✍ Generate Itineraries"):
                     with st.spinner("Generating itinerary, please wait..."):
                         try:
                             start_time = time.time()
@@ -198,7 +198,7 @@ def streamlit_page():
  
             with col2:
                 if st.session_state.all_generated_itineraries:
-                    if st.sidebar.button("Email All Itineraries", key="export_all_itineraries"):
+                    if st.button("Email All Itineraries", key="export_all_itineraries"):
                         if send_to_gsheets(email_address,destination,start_date,end_date):
                             arguments = ['V1','V2','V3']
                             send_email(arguments)
