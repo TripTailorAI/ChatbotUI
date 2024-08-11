@@ -181,8 +181,35 @@ def streamlit_page():
         key="generate_nightlife"
     )
 
-
-    if st.session_state.button_clicked:
+    with st.sidebar:
+        # Add a container inside the sidebar
+        with st.container():
+            # Create two columns inside the container
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("✍ Generate Itineraries"):
+                    start = datetime.combine(start_date, datetime.min.time())
+                    end = datetime.combine(end_date, datetime.min.time())
+                    # Validation conditions
+                    if end < start:
+                        st.error("Error: End date must be after the start date.")
+                    elif (end - start).days > 7:
+                        st.error("Error: The difference between start and end date must be 7 days")
+                    else:    
+                        button_click()
+            with col2:
+                if st.session_state.all_generated_itineraries:
+                    if st.button("Email All Itineraries", key="export_all_itineraries"):
+                        if not email_address:
+                            st.error("Error: Please enter your email address.")
+                        if send_to_gsheets(email_address,destination,start_date,end_date):
+                            arguments = ['V1','V2','V3']
+                            send_email(arguments)
+                            st.sidebar.success("Most recent itinerary set exported successfully!")
+                        else:
+                            st.sidebar.error("No itineraries to export. Please generate an itinerary first.")
+            
+        if st.session_state.button_clicked:
         with st.spinner("Generating itinerary, please wait..."):
             try:
                 start_time = time.time()
@@ -227,34 +254,6 @@ def streamlit_page():
 
         st.session_state.button_clicked = False
 
-
-    with st.sidebar:
-        # Add a container inside the sidebar
-        with st.container():
-            # Create two columns inside the container
-            col1, col2 = st.columns(2)
-            with col1:
-                if st.button("✍ Generate Itineraries"):
-                    start = datetime.combine(start_date, datetime.min.time())
-                    end = datetime.combine(end_date, datetime.min.time())
-                    # Validation conditions
-                    if end < start:
-                        st.error("Error: End date must be after the start date.")
-                    elif (end - start).days > 7:
-                        st.error("Error: The difference between start and end date must be 7 days")
-                    button_click()
-            with col2:
-                if st.session_state.all_generated_itineraries:
-                    if st.button("Email All Itineraries", key="export_all_itineraries"):
-                        if not email_address:
-                            st.error("Error: Please enter your email address.")
-                        if send_to_gsheets(email_address,destination,start_date,end_date):
-                            arguments = ['V1','V2','V3']
-                            send_email(arguments)
-                            st.sidebar.success("Most recent itinerary set exported successfully!")
-                        else:
-                            st.sidebar.error("No itineraries to export. Please generate an itinerary first.")
-            
     if st.session_state.all_generated_itineraries:
         # Create the table data
         table_data = []        
