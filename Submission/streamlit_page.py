@@ -58,6 +58,10 @@ def streamlit_pageconfig():
         
     if 'custom_preferences' not in st.session_state:
         st.session_state.custom_preferences = ""
+    st.session_state.custom_preferences = "E.g.: 'Handicap accessible places / vegetarian friendly options.'"
+
+    if st.session_state.custom_preferences:
+        st.session_state.custom_preferences = ""
 
     if 'button_clicked' not in st.session_state:
         st.session_state.button_clicked = False
