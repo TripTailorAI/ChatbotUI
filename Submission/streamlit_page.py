@@ -179,7 +179,7 @@ def streamlit_page():
         key="custom_pref_input",
         help="Enter any special requirements E.g. Handicap accessible places / vegetarian friendly options.")
 
-    if st.session_state.custom_preferences:
+    if custom_preferences != st.session_state.custom_preferences:
         st.session_state.custom_preferences = ""
     # st.session_state.custom_preferences = custom_preferences
 
