@@ -62,8 +62,6 @@ def streamlit_pageconfig():
     if 'button_clicked' not in st.session_state:
         st.session_state.button_clicked = False
 
-    st.session_state.custom_preferences = "E.g. Handicap accessible places / vegetarian friendly options."
-
     # List of all countries
 countries = sorted([country.name for country in pycountry.countries])
 
@@ -174,14 +172,12 @@ def streamlit_page():
     st.session_state.mode_of_transport = mode_of_transport
     mode_of_transport_value = transport_modes[mode_of_transport]
 
-    custom_preferences = st.sidebar.text_input("✨ Custom Preferences", 
+    custom_preferences = st.sidebar.text_input("✨ Custom Preferences - E.g. Handicap accessible or vegetarian friendly options.", 
         value=st.session_state.custom_preferences,
         key="custom_pref_input",
         help="Enter any special requirements E.g. Handicap accessible places / vegetarian friendly options.")
 
-    if custom_preferences != st.session_state.custom_preferences:
-        st.session_state.custom_preferences = ""
-    # st.session_state.custom_preferences = custom_preferences
+    st.session_state.custom_preferences = custom_preferences
 
     if 'generate_nightlife' not in st.session_state:
         st.session_state.generate_nightlife = False
