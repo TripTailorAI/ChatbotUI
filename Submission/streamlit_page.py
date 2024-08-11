@@ -105,6 +105,8 @@ def streamlit_page():
             gap: 2px;
             padding-top: 2px;
             padding-bottom: 2px;
+            padding-left: 2px;
+            padding-right: 2px;
         }
 
         .stTabs [aria-selected="true"] {
