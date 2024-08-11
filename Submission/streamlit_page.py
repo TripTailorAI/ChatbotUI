@@ -94,15 +94,15 @@ def streamlit_page():
 
         /* Tab styling */
         .stTabs [data-baseweb="tab-list"] {
-            gap: 24px;
+            gap: 50px;
         }
 
         .stTabs [data-baseweb="tab"] {
             height: 50px;
-            white-space: pre-wrap;
+            /* white-space: pre-wrap; */
             background-color: #F0F2F6;
             border-radius: 4px 4px 4px 4px;
-            gap: 1px;
+            gap: 2px;
             padding-top: 10px;
             padding-bottom: 10px;
         }
