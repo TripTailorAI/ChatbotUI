@@ -226,6 +226,13 @@ def streamlit_page():
             col1, col2 = st.columns(2)
             with col1:
                 if st.button("✍ Generate Itineraries"):
+                    start = datetime.combine(start_date, datetime.min.time())
+                    end = datetime.combine(end_date, datetime.min.time())
+                    # Validation conditions
+                    if end <= start:
+                        st.error("Error: End date must be after the start date.")
+                    elif (end - start).days > 7:
+                        st.error("Error: The difference between start and end date must be 7 days 
                     button_click()
             with col2:
                 if st.session_state.all_generated_itineraries:
