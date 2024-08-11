@@ -115,6 +115,18 @@ def streamlit_page():
         .stTabs [aria-selected="true"] {
             background-color: #F0F2F6;
         }
+
+        @media (prefers-color-scheme: dark) {
+        .stTabs [data-baseweb="tab"] {
+            background-color: #333; /* Dark background */
+            color: #FFF; /* White text */
+        }
+
+        .stTabs [aria-selected="true"] {
+            background-color: #555; /* Slightly lighter dark background */
+            color: #FFF; /* White text */
+        }
+        }
         </style>
         """,
         unsafe_allow_html=True
