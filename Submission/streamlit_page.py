@@ -2,14 +2,10 @@ import streamlit as st
 import pycountry
 from datetime import datetime, timedelta, date
 import traceback
-# from io import BytesIO
-# from place_weather import get_place_details, get_weather_forecast
-# from get_itinerary import get_daily_itinerary, get_nightlife_itinerary
 from output import display_itinerary, send_to_gsheets, send_email
 from create_itinerary import create_travel_itinerary, create_night_itinerary
 import time
 import pandas as pd
-# from datetime import datetime
 
 def format_date(date_string):
     # Parse the input date string
@@ -132,7 +128,6 @@ def streamlit_page():
     ) 
 
     # Input fields
-    # Email address input
     email_address = st.sidebar.text_input(
         "📧 Email Address",
         value=st.session_state.email_address,
@@ -181,7 +176,6 @@ def streamlit_page():
     if 'generate_nightlife' not in st.session_state:
         st.session_state.generate_nightlife = False
 
-    # In the sidebar, where you create the checkbox:
     st.sidebar.checkbox(
         "🌙 Generate Nightlife Itinerary",
         key="generate_nightlife"
@@ -262,13 +256,11 @@ def streamlit_page():
                             st.sidebar.error("No itineraries to export. Please generate an itinerary first.")
             
     if st.session_state.all_generated_itineraries:
-        # st.subheader("TripTailorAI's Response")
         # Create the table data
         table_data = []        
         # Display the most recently generated itinerary set
         most_recent_set = st.session_state.all_generated_itineraries[-1]
         st.write("## Current Search Itineraries")
-        # st.write(most_recent_set)
         trip_details = most_recent_set.get('trip_details')
         st.write(f"### 🔸 {trip_details['destination']}, {trip_details['country']}  |  {format_date(trip_details['start_date'])} to {format_date(trip_details['end_date'])}")
 
