@@ -237,8 +237,9 @@ def streamlit_page():
             with col2:
                 if st.session_state.all_generated_itineraries:
                     if st.button("Email All Itineraries", key="export_all_itineraries"):
-    if not email:
-        st.error("Error: Please enter your email address.")if send_to_gsheets(email_address,destination,start_date,end_date):
+                        if not email:
+                            st.error("Error: Please enter your email address.")
+                        if send_to_gsheets(email_address,destination,start_date,end_date):
                             arguments = ['V1','V2','V3']
                             send_email(arguments)
                             st.sidebar.success("Most recent itinerary set exported successfully!")
