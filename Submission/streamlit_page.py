@@ -57,7 +57,7 @@ def streamlit_pageconfig():
         st.session_state.mode_of_transport = "🚗 Driving"
         
     if 'custom_preferences' not in st.session_state:
-        st.session_state.custom_preferences = "E.g.: 'Handicap accessible places / vegetarian friendly options.'"
+        st.session_state.custom_preferences = "E.g. Handicap accessible places / vegetarian friendly options."
 
     if 'button_clicked' not in st.session_state:
         st.session_state.button_clicked = False
@@ -173,13 +173,13 @@ def streamlit_page():
     mode_of_transport_value = transport_modes[mode_of_transport]
 
     custom_preferences = st.sidebar.text_input("✨ Custom Preferences", 
-        value=st.session_state.custom_preferences,
+        value="E.g. Handicap accessible places / vegetarian friendly options.",
         key="custom_pref_input",
-        help="Enter any special requirements or preferences for your trip here.")
+        help="Enter any special requirements E.g. Handicap accessible places / vegetarian friendly options.")
 
+    if st.session_state.custom_preferences:
+        st.session_state.custom_preferences = ""
     st.session_state.custom_preferences = custom_preferences
-    # if st.session_state.custom_preferences:
-    #     st.session_state.custom_preferences = ""
 
     if 'generate_nightlife' not in st.session_state:
         st.session_state.generate_nightlife = False
