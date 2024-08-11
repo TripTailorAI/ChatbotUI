@@ -173,7 +173,7 @@ def streamlit_page():
     mode_of_transport_value = transport_modes[mode_of_transport]
 
     custom_preferences = st.sidebar.text_input("✨ Custom Preferences", 
-        value="E.g. Handicap accessible places / vegetarian friendly options.",
+        value=st.session_state.custom_preferences,
         key="custom_pref_input",
         help="Enter any special requirements E.g. Handicap accessible places / vegetarian friendly options.")
 
