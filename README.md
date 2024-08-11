@@ -50,7 +50,7 @@ Contributions to TripTailorAI are welcome! Please feel free to submit a Pull Req
 
 ## Acknowledgments
 - Google Places API
-- Weather API (provider name)
+- Weather API (api.weatherapi.com)
 - Google Generative AI
 - Streamlit for the web application framework
 - Google AppScript
