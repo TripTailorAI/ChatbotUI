@@ -14,6 +14,7 @@ from reportlab.lib.units import inch
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from io import BytesIO
+from urllib.parse import quote_plus
 
 pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf'))
 pdfmetrics.registerFont(TTFont('DejaVuSans-Bold', 'DejaVuSans-Bold.ttf'))
@@ -102,7 +103,7 @@ def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport
             address = activity['place']['formatted_address']
             opening_hours = activity.get('opening_hours', 'N/A')
             
-            itinerary_message += f"- {time}: {activity_name} at [{place_name}]({activity['place'].get('url', '#')})\n"
+            itinerary_message += f"- {time}: {activity_name} at [{place_name}]({quote_plus(activity['place'].get('url', '#'))})\n"
             itinerary_message += f"  - Address: {address}\n"
             itinerary_message += f"  - Opening Hours: {opening_hours}\n"
             if i < len(day['activities']) - 1:
