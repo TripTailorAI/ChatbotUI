@@ -147,11 +147,17 @@ def streamlit_page():
     today = date.today()
     tomorrow = today + timedelta(days=1)
 
-    start_date = st.sidebar.date_input("🗓️ Start Date", min_value=tomorrow, value=st.session_state.start_date)
-    st.session_state.start_date = start_date
-
-    end_date = st.sidebar.date_input("🗓️ End Date", min_value=tomorrow, value=st.session_state.end_date)
-    st.session_state.end_date = end_date
+    with st.sidebar:
+        # Add a container inside the sidebar
+        with st.container():
+            # Create two columns inside the container
+            col1, col2 = st.columns(2)
+            with col1:
+                start_date = st.sidebar.date_input("🗓️ Start Date", min_value=tomorrow, value=st.session_state.start_date)
+                st.session_state.start_date = start_date
+            with col2:
+                end_date = st.sidebar.date_input("🗓️ End Date", min_value=tomorrow, value=st.session_state.end_date)
+                st.session_state.end_date = end_date
 
     purpose_of_stay = st.sidebar.selectbox("🎯 Purpose of Stay", ["Vacation", "Business"], index=["Vacation", "Business"].index(st.session_state.purpose_of_stay))
     st.session_state.purpose_of_stay = purpose_of_stay
@@ -197,6 +203,8 @@ def streamlit_page():
                         st.error("Error: The difference between start and end date must be 7 days")
                     else:    
                         button_click()
+                    if not destination:
+                        st.error("Error: Please enter destination.")
             with col2:
                 if st.session_state.all_generated_itineraries:
                     if st.button("Email All Itineraries", key="export_all_itineraries"):
