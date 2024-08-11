@@ -103,7 +103,7 @@ def display_itinerary(itinerary, set_number, itinerary_number, mode_of_transport
             address = activity['place']['formatted_address']
             opening_hours = activity.get('opening_hours', 'N/A')
             
-            itinerary_message += f"- {time}: {activity_name} at [{place_name}]({quote_plus(activity['place'].get('url', '#'))})\n"
+            itinerary_message += f"- {time}: {activity_name} at [{place_name}]({activity['place'].get('url', '#')})\n"
             itinerary_message += f"  - Address: {address}\n"
             itinerary_message += f"  - Opening Hours: {opening_hours}\n"
             if i < len(day['activities']) - 1:
