@@ -2,16 +2,24 @@
 
 TripTailorAI is an intelligent travel itinerary generator that creates personalized trip plans based on user preferences and real-time data.
 
+## What Makes it Unique
+- Made with end user in mind - Get a simple pdf guide in Grid format with map links to places
+- With the custom prompt, you can even tell TripTailor to provide 
+-- handicap accessible itineraries
+-- vegetarian friendly optipons
+-- and other customisations
+
 ## Features
 
 - 🗺️ Generate detailed and customised travel itineraries for any destination
 - 🚗 Support for multiple transportation modes (Public Transport, Driving, etc.)
-- 🌐 NO APP Downloads needed
+- 🌐 NO APP Downloads, Signups or Paywalls!
 - 🌤️ Incorporate real-time weather forecasts
 - 🕒 Suggest activities with opening hours and travel times
 - 📅 Multi-day trip planning
 - 🔎 Integration with Google Places API for accurate location data
 - 📧 Export itineraries as PDF or send via email
+
 
 ## Getting Started
 
@@ -47,8 +55,10 @@ Contributions to TripTailorAI are welcome! Please feel free to submit a Pull Req
 - Weather API (provider name)
 - Google Generative AI
 - Streamlit for the web application framework
+- Google AppScript
 
 ## Future Roadmaps
+- Connect with Google Local Guide for verification of generated itineraries for additional fees
 - Multi City Trip generation
-- What do you need to pack for your trip (based on weather etc.)
-- Travel Pack Rental for your itinerary
+- Generate Travel Packing checklist - ease out the stress of packing.
+- Provide Travel Pack Rental for your itinerary
