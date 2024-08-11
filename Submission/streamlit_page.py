@@ -232,7 +232,7 @@ def streamlit_page():
                     if end <= start:
                         st.error("Error: End date must be after the start date.")
                     elif (end - start).days > 7:
-                        st.error("Error: The difference between start and end date must be 7 days 
+                        st.error("Error: The difference between start and end date must be 7 days")
                     button_click()
             with col2:
                 if st.session_state.all_generated_itineraries:
