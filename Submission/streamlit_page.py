@@ -100,15 +100,15 @@ def streamlit_page():
         .stTabs [data-baseweb="tab"] {
             height: 50px;
             /* white-space: pre-wrap; */
-            background-color: #F0F2F6;
-            border-radius: 4px 4px 4px 4px;
+            background-color: #FFFFFF;
+            border-radius: 2px 2px 2px 2px;
             gap: 2px;
             padding-top: 10px;
             padding-bottom: 10px;
         }
 
         .stTabs [aria-selected="true"] {
-            background-color: #FFFFFF;
+            background-color: #F0F2F6;
         }
         </style>
         """,
