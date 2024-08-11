@@ -138,14 +138,14 @@ def streamlit_page():
         key="generate_nightlife"
     )
 
-    col1, col2, col3 = st.columns([1,1,1])
+    col1, col2, col3 = st.sidebar.columns([1,1,1])
 
     with col1:
-        st.button('1')
+        st.sidebar.button('1')
     with col2:
-        st.button('2')
+        st.sidebar.button('2')
     with col3:
-        st.button('3')
+        st.sidebar.button('3')
 
     if st.sidebar.button("✍ Generate Itineraries"):
         with st.spinner("Generating itinerary, please wait..."):
