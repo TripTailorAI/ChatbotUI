@@ -1,32 +1,15 @@
 import streamlit as st
 import requests
-import json
 import pandas as pd
-import random
 import google.generativeai as genai
-from datetime import datetime, timedelta, date
-import traceback
 import time
-import pycountry
-from google.oauth2.service_account import Credentials
-from google.oauth2 import service_account
-import google.auth.transport.requests
-from reportlab.lib import colors
-from reportlab.lib.pagesizes import letter, landscape
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import inch
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-from io import BytesIO
 GOOGLE_API_KEY = st.secrets['GOOGLE_API_KEY']
 genai.configure(api_key=GOOGLE_API_KEY)
 google_places_api_key = st.secrets['MAPS_API_KEY']
 weather_api_key = st.secrets['WEATHER']
 
 from place_weather import get_place_details, get_weather_forecast
-from get_itinerary import get_daily_itinerary, get_nightlife_itinerary, is_place_in_location, get_place_opening_hours
-from output import create_itinerary_pdf, display_itinerary, generate_df, send_to_gsheets, getAccessToken, send_email
+from get_itinerary import get_daily_itinerary, get_nightlife_itinerary, get_place_opening_hours
 
 @st.cache_data(ttl=3600,show_spinner=False)
 def create_travel_itinerary(destination, country, start_date, end_date, hotel_name, purpose_of_stay, mode_of_transport, custom_preferences):
@@ -53,7 +36,6 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
 
             if daily_itinerary is None:
                 # print(f"Error: Failed to get itinerary from GeminiAI for {current_date}")
-                print(f"Skipping this day in the itinerary.")
                 continue
 
             verified_itinerary = []
@@ -81,7 +63,6 @@ def create_travel_itinerary(destination, country, start_date, end_date, hotel_na
                 for i in range(len(verified_itinerary) - 1):
                     origin = verified_itinerary[i]['place']['formatted_address']
                     destination = verified_itinerary[i + 1]['place']['formatted_address']
-                    dep_time = verified_itinerary[i + 1]['time_int']
                     act_time = verified_itinerary[i + 1]['time']
                     date_time = current_date+' '+act_time+':00'
                     pattern = '%Y-%m-%d %H:%M:%S'
@@ -181,7 +162,6 @@ def create_night_itinerary(destination, country, start_date, end_date, hotel_nam
                 for i in range(len(verified_itinerary) - 1):
                     origin = verified_itinerary[i]['place']['formatted_address']
                     destination = verified_itinerary[i + 1]['place']['formatted_address']
-                    dep_time = verified_itinerary[i + 1]['time_int']
                     act_time = verified_itinerary[i + 1]['time']
                     date_time = current_date+' '+act_time+':00'
                     pattern = '%Y-%m-%d %H:%M:%S'
