@@ -94,7 +94,7 @@ def streamlit_page():
 
         /* Tab styling */
         .stTabs [data-baseweb="tab-list"] {
-            gap: 35px;
+            gap: 12px;
         }
 
         .stTabs [data-baseweb="tab"] {
