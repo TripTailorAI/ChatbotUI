@@ -209,7 +209,7 @@ def streamlit_page():
                         else:
                             st.sidebar.error("No itineraries to export. Please generate an itinerary first.")
             
-        if st.session_state.button_clicked:
+    if st.session_state.button_clicked:
         with st.spinner("Generating itinerary, please wait..."):
             try:
                 start_time = time.time()
