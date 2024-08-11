@@ -10,6 +10,17 @@ from create_itinerary import create_travel_itinerary, create_night_itinerary
 import time
 import pandas as pd
 
+from datetime import datetime
+
+def format_date(date_string):
+    # Parse the input date string
+    date_object = datetime.strptime(date_string, "%Y-%m-%d")
+    
+    # Format the date to the desired output
+    formatted_date = date_object.strftime("%d-%b-%y")
+    
+    return formatted_date
+
 def streamlit_pageconfig():
     if 'messages' not in st.session_state:
         st.session_state.messages = []
@@ -216,7 +227,7 @@ def streamlit_page():
         # st.write("## Most Recent Itineraries")
         # st.write(most_recent_set)
         trip_details = most_recent_set.get('trip_details')
-        st.write(f"#### {trip_details['destination']}, {trip_details['country']} | {trip_details['start_date']} to {trip_details['end_date']}")
+        st.write(f"#### {trip_details['destination']}, {trip_details['country']} | {format_date(trip_details['start_date'])} to {format_date(trip_details['end_date'])}")
 
 
         if isinstance(most_recent_set, dict):
