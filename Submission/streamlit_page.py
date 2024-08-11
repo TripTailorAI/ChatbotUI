@@ -285,6 +285,7 @@ def streamlit_page():
                         st.write("#### Day Itinerary")
                         day_data = display_itinerary(day_itinerary, st.session_state.itinerary_set_count, itinerary_number, mode_of_transport, email_address, destination, start_date, end_date)
                         table_data.extend(day_data)
+        st.markdown("""---""")
 
 
         # Display all previously generated itinerary sets in reverse order
