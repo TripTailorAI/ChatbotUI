@@ -60,13 +60,14 @@ def streamlit_page():
     # Streamlit app
     st.title("TripTailorAI🌎")
     # Short instructions
-    st.write("""
-    💡 **How to use TripTailorAI:**
-    1. Fill in your trip details in the sidebar
-    2. Add any custom preferences
-    3. Click 'Generate Itineraries'
-    4. Review and export your personalized travel plans!
-    """)
+    if not st.session_state.all_generated_itineraries:
+        st.write("""
+        💡 **How to use TripTailorAI:**
+        1. Fill in your trip details in the sidebar
+        2. Add any custom preferences
+        3. Click 'Generate Itineraries'
+        4. Review and export your personalized travel plans!
+        """)
     
     # Sidebar for itinerary generation
     st.sidebar.title("Itinerary Generator")
@@ -207,7 +208,7 @@ def streamlit_page():
                             st.sidebar.error("No itineraries to export. Please generate an itinerary first.")
             
     if st.session_state.all_generated_itineraries:
-        st.subheader("TripTailorAI's Response")
+        # st.subheader("TripTailorAI's Response")
         # Create the table data
         table_data = []        
         # Display the most recently generated itinerary set
