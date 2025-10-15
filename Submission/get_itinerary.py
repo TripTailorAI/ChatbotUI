@@ -54,7 +54,7 @@ def get_daily_itinerary(destination, country, date, hotel_name, purpose_of_stay,
         ...
     }}
     """
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-2.5-flash')
     response = model.generate_content(user_message)
 
     try:
@@ -151,5 +151,6 @@ def get_place_opening_hours(place, date):
                 return f"{open_time} - Open 24 hours"
             close_time = datetime.strptime(period['close']['time'], "%H%M").strftime("%I:%M %p")
             return f"{open_time} - {close_time}"
+
 
     return "Closed"
